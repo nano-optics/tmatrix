@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nano-optics.github.io/tmatrix/matlab_export.html</loc>
-    <lastmod>2024-03-14T01:15:58.780Z</lastmod>
+    <loc>https://nano-optics.github.io/tmatrix/display.html</loc>
+    <lastmod>2024-03-14T07:01:00.141Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nano-optics.github.io/tmatrix/indexing.html</loc>
+    <lastmod>2024-03-14T07:28:16.331Z</lastmod>
   </url>
   <url>
     <loc>https://nano-optics.github.io/tmatrix/about.html</loc>
@@ -13,11 +17,23 @@
     <lastmod>2024-03-14T01:15:53.327Z</lastmod>
   </url>
   <url>
+    <loc>https://nano-optics.github.io/tmatrix/smarties.html</loc>
+    <lastmod>2024-03-14T07:00:48.386Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nano-optics.github.io/tmatrix/conversion.html</loc>
+    <lastmod>2024-03-14T07:00:55.723Z</lastmod>
+  </url>
+  <url>
     <loc>https://nano-optics.github.io/tmatrix/index.html</loc>
-    <lastmod>2024-03-14T01:12:22.973Z</lastmod>
+    <lastmod>2024-03-14T07:00:51.353Z</lastmod>
   </url>
   <url>
     <loc>https://nano-optics.github.io/tmatrix/julia_export.html</loc>
-    <lastmod>2024-03-14T01:16:03.236Z</lastmod>
+    <lastmod>2024-03-14T07:00:41.083Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nano-optics.github.io/tmatrix/matlab_export.html</loc>
+    <lastmod>2024-03-14T07:01:09.112Z</lastmod>
   </url>
 </urlset>

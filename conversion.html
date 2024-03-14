@@ -9,7 +9,7 @@
 <meta name="author" content="baptiste">
 <meta name="dcterms.date" content="2024-03-14">
 
-<title>T-matrix</title>
+<title>T-matrix - Conversion long/wide</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -69,6 +103,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -110,7 +173,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./conversion.html"> 
+    <a class="nav-link active" href="./conversion.html" aria-current="page"> 
 <span class="menu-text">Conversion long/wide</span></a>
   </li>  
   <li class="nav-item">
@@ -141,9 +204,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#examples-of-export-with-dummy-data" id="toc-examples-of-export-with-dummy-data" class="nav-link active" data-scroll-target="#examples-of-export-with-dummy-data">Examples of export with dummy data</a></li>
-  <li><a href="#displaying-t-matrices" id="toc-displaying-t-matrices" class="nav-link" data-scroll-target="#displaying-t-matrices">Displaying T-matrices</a></li>
-  <li><a href="#smarties-examples" id="toc-smarties-examples" class="nav-link" data-scroll-target="#smarties-examples">SMARTIES examples</a></li>
+  <li><a href="#reading-long-format-t-matrix-files" id="toc-reading-long-format-t-matrix-files" class="nav-link active" data-scroll-target="#reading-long-format-t-matrix-files">Reading long-format T-matrix files</a></li>
+  <li><a href="#convert-to-wide" id="toc-convert-to-wide" class="nav-link" data-scroll-target="#convert-to-wide">Convert to wide</a></li>
   </ul>
 </nav>
     </div>
@@ -152,7 +214,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">T-matrix</h1>
+<h1 class="title">Conversion long/wide</h1>
 </div>
 
 
@@ -181,26 +243,55 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Collection of scripts and self-contained examples to export/import T-matrices.</p>
-<section id="examples-of-export-with-dummy-data" class="level2">
-<h2 class="anchored" data-anchor-id="examples-of-export-with-dummy-data">Examples of export with dummy data</h2>
-<ul>
-<li>Doc: <a href="R_export.html">R</a> • Script: <a href="R_dummy.R">R_dummy.R</a> • Output: <a href="ar.tmat.h5">ar.tmat.h5</a></li>
-<li>Doc: <a href="matlab_export.html">Matlab</a> • Script: <a href="matlab_dummy.m">matlab_dummy.m</a> • Output: <a href="ar.tmat.h5">am.tmat.h5</a></li>
-<li>Doc: <a href="julia_export.html">Julia</a> • Script: <a href="julia_dummy.jl">julia_dummy.jl</a> • Output: <a href="ar.tmat.h5">aj.tmat.h5</a></li>
-</ul>
+<p><a href="_fun.R">R utility functions</a> used below.</p>
+<section id="reading-long-format-t-matrix-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-long-format-t-matrix-files">Reading long-format T-matrix files</h2>
+<p>Some programs output T-matrices in long format, similar to the example below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">'data/tmat_Au20x40_Nmax3.tmat'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(d) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'s'</span>,<span class="st">'sp'</span>,<span class="st">'l'</span>,<span class="st">'lp'</span>,<span class="st">'m'</span>,<span class="st">'mp'</span>,<span class="st">'Tr'</span>,<span class="st">'Ti'</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  s sp l lp  m mp            Tr            Ti
+1 1  1 1  1 -1 -1 -6.049214e-05 -4.266526e-04
+2 1  1 1  1  0  0 -3.331557e-05 -3.932179e-04
+3 1  1 1  1  1  1 -6.049214e-05 -4.266526e-04
+4 1  1 1  3 -1 -1 -2.374705e-07 -1.995117e-06
+5 1  1 1  3  0  0 -1.110299e-07 -1.278537e-06
+6 1  1 1  3  1  1 -2.374705e-07 -1.995117e-06</code></pre>
+</div>
+</div>
+<p>Note that one advantage of this format is that only non-zero entries need to be provided, similar to a sparse matrix definition. With such data, it can be useful to add combined indices <span class="math inline">\(p\)</span> (blocks) and <span class="math inline">\(q\)</span> (full matrix), as illustrated below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">tmatrix_combinedindex</span>(d)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  s sp l lp  m mp            Tr            Ti p pp q qp
+1 1  1 1  1 -1 -1 -6.049214e-05 -4.266526e-04 1  1 1  1
+2 1  1 1  1  0  0 -3.331557e-05 -3.932179e-04 2  2 2  2
+3 1  1 1  1  1  1 -6.049214e-05 -4.266526e-04 3  3 3  3
+4 1  1 1  3 -1 -1 -2.374705e-07 -1.995117e-06 1 11 1 11
+5 1  1 1  3  0  0 -1.110299e-07 -1.278537e-06 2 12 2 12
+6 1  1 1  3  1  1 -2.374705e-07 -1.995117e-06 3 13 3 13</code></pre>
+</div>
+</div>
 </section>
-<section id="displaying-t-matrices" class="level2">
-<h2 class="anchored" data-anchor-id="displaying-t-matrices">Displaying T-matrices</h2>
-<ul>
-<li><a href="display.html">Display</a></li>
-</ul>
-</section>
-<section id="smarties-examples" class="level2">
-<h2 class="anchored" data-anchor-id="smarties-examples">SMARTIES examples</h2>
-<ul>
-<li><a href="smarties.html">Smarties</a></li>
-</ul>
+<section id="convert-to-wide" class="level2">
+<h2 class="anchored" data-anchor-id="convert-to-wide">Convert to wide</h2>
+<p>If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the right indices:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">tmatrix_wide</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>30 x 30 matrix of characters: 
+
+                   [,1]              [,2] ...             [,30]
+[1,]  -6.0e-05-4.3e-04i  0.0e+00+0.0e+00i ...  0.0e+00+0.0e+00i
+[2,]   0.0e+00+0.0e+00i -3.3e-05-3.9e-04i ...  0.0e+00+0.0e+00i
+[3,]   0.0e+00+0.0e+00i  0.0e+00+0.0e+00i ...  0.0e+00+0.0e+00i
+...                 ...               ... ...               ...
+[30,]  0.0e+00+0.0e+00i  0.0e+00+0.0e+00i ... -6.5e-09+1.9e-07i</code></pre>
+</div>
+</div>
 
 
 </section>
