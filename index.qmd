@@ -1,0 +1,21 @@
+---
+title: "T-matrix"
+author: "baptiste"
+date: today
+---
+
+Collection of scripts and self-contained examples to export/import T-matrices.
+
+## Examples of export with dummy data
+
+- Doc: [R](R_export.html) • Script: [test_dummy.R](test_dummy.R) • Output: [ar.tmat.h5](ar.tmat.h5)
+- Doc: [Matlab](matlab_export.html) • Script: [test_dummy.m](test_dummy.m) • Output: [am.tmat.h5](am.tmat.h5)
+- Doc: [Julia](julia_export.html) • Script: [test_dummy.jl](test_dummy.jl) • Output: [aj.tmat.h5](aj.tmat.h5)
+
+## Displaying T-matrices
+
+- [Display](display.html)
+
+## SMARTIES examples
+
+- [Smarties](smarties.html)

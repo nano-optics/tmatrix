@@ -1,0 +1,36 @@
+project:
+  type: website
+
+website:
+  title: "T-matrix"
+  navbar:
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://github.com/nano-optics/tmatrix
+          - text: Discussion
+            url:  https://github.com/nano-optics/tmatrix/discussions
+    left:
+      - text: "Exporting to HDF5"
+        menu:
+        - R_export.qmd
+        - matlab_export.qmd 
+        - julia_export.qmd 
+      - text: "Conversion long/wide"
+        file: conversion.qmd
+      - text: "Indexing reference"
+        file: indexing.qmd
+      - text: "Displaying T-matrices"
+        file: display.qmd
+      - text: "SMARTIES"
+        file: smarties.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

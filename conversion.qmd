@@ -1,0 +1,50 @@
+---
+title: "Conversion long/wide"
+format: html
+author: "baptiste"
+date: today
+---
+
+[R utility functions](_fun.R) used below.
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(grid)
+library(patchwork)
+read_chunk('_fun.R')
+source("_fun.R")
+```
+
+
+## Reading long-format T-matrix files
+
+Some programs output T-matrices in long format, similar to the example below:
+
+```{r}
+d <- read.table('data/tmat_Au20x40_Nmax3.tmat')
+names(d) <- c('s','sp','l','lp','m','mp','Tr','Ti')
+head(d)
+```
+
+Note that one advantage of this format is that only non-zero entries need to be provided, similar to a sparse matrix definition.
+With such data, it can be useful to add combined indices $p$ (blocks) and $q$ (full matrix), as illustrated below:
+
+```{r}
+d <- tmatrix_combinedindex(d)
+head(d)
+```
+
+## Convert to wide
+
+If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the right indices:
+
+```{r wide, echo=1}
+w <- tmatrix_wide(d)
+
+prettymat(w, coldots=3)
+```
+
+
+
