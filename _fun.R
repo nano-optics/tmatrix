@@ -1,4 +1,26 @@
 
+write_attributes <- function(object, names, attributes, 
+                             type=c("root","dataset","group")){
+  
+  switch(type,
+         "root" = {
+           stopifnot(object == "/")
+           purrr::walk2(names, attributes, \(n,a) h5writeAttribute(n, fid, a))
+         },         
+         "dataset" = {
+           did <- H5Dopen(fid, object)
+           purrr::walk2(names, attributes, \(n,a) h5writeAttribute(n, did, a))
+           H5Dclose(did)
+         },
+         "group" = {
+           did <- H5Gopen(fid, object)
+           purrr::walk2(names, attributes, \(n,a) h5writeAttribute(n, did, a))
+           H5Gclose(did)
+         },
+         error("needs to be a group, dataset, or root"))
+  
+}
+
 ## ---- tmatrix_combinedindex
 p_index <- function(l, m){
   p <- l*(l+1) + m

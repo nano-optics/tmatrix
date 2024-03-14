@@ -214,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This document describes the process of exporting T-matrices in the standardised HDF5 format in Julia. For illustration, we start by producing a dummy dataset.</p>
+<p>This document describes the process of exporting T-matrices in the standardised HDF5 format in Julia. For illustration, we start by producing a dummy dataset. A minimal reproducible example file is available for download: <a href="test_dummy.jl">test_dummy.jl</a>.</p>
 <section id="mockup-input-data" class="level2">
 <h2 class="anchored" data-anchor-id="mockup-input-data">Mockup input data</h2>
 <p>For convenience, we store compound objects as named tuples, which will then be mapped into HDF5 groups during export. I did not find how to link the embedding medium from materials to the top level, so it is simply duplicated.</p>
@@ -234,8 +234,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># dummy 'analytical zeros' for e.g. EBCM methods</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>azeros <span class="op">=</span> <span class="fu">collect</span>(<span class="bu">Iterators</span>.<span class="fu">product</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">30</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">30</span>))</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>analytical_zeros <span class="op">=</span> (p<span class="op">=</span>[z[<span class="fl">1</span>] for z <span class="kw">in</span> azeros[<span class="op">:</span>]],</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    pp<span class="op">=</span>[z[<span class="fl">2</span>] for z <span class="kw">in</span> azeros[<span class="op">:</span>]])</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>analytical_zeros <span class="op">=</span> (q<span class="op">=</span>[z[<span class="fl">1</span>] for z <span class="kw">in</span> azeros[<span class="op">:</span>]],</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    qp<span class="op">=</span>[z[<span class="fl">2</span>] for z <span class="kw">in</span> azeros[<span class="op">:</span>]])</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>embedding <span class="op">=</span> (relative_permeability<span class="op">=</span><span class="fl">1.0</span>,</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    relative_permittivity<span class="op">=</span><span class="fl">1.33</span><span class="op">^</span><span class="fl">2</span>)</span>
