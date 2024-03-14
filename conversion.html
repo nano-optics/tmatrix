@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="baptiste">
-<meta name="dcterms.date" content="2024-03-14">
+<meta name="dcterms.date" content="2024-03-15">
 
 <title>T-matrix - Conversion long/wide</title>
 <style>
@@ -220,6 +220,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#reading-long-format-t-matrix-files" id="toc-reading-long-format-t-matrix-files" class="nav-link active" data-scroll-target="#reading-long-format-t-matrix-files">Reading long-format T-matrix files</a></li>
+  <li><a href="#reading-wide-data-and-converting-to-long-format" id="toc-reading-wide-data-and-converting-to-long-format" class="nav-link" data-scroll-target="#reading-wide-data-and-converting-to-long-format">Reading wide data and converting to long format</a></li>
   <li><a href="#convert-to-wide" id="toc-convert-to-wide" class="nav-link" data-scroll-target="#convert-to-wide">Convert to wide</a></li>
   </ul>
 </nav>
@@ -246,7 +247,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 14, 2024</p>
+      <p class="date">March 15, 2024</p>
     </div>
   </div>
   
@@ -291,20 +292,51 @@ window.Quarto = {
 </div>
 </div>
 </section>
+<section id="reading-wide-data-and-converting-to-long-format" class="level2">
+<h2 class="anchored" data-anchor-id="reading-wide-data-and-converting-to-long-format">Reading wide data and converting to long format</h2>
+<p>The function <code>read_treams()</code> reads a standard HDF5-stored T-matrix and returns it in long format, including the computation’s <code>method_parameters</code> fields.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read_treams</span>(<span class="st">'data/SPH-DE~4.H5'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  s sp l lp  m mp            Tr            Ti          mod p pp q qp domain_x
+1 1  1 1  1 -1 -1 -5.907953e-05 -4.253829e-04 4.294659e-04 1  1 1  1      633
+2 1  1 1  1  0  0 -3.230918e-05 -3.810847e-04 3.824519e-04 2  2 2  2      633
+3 1  1 1  1  1  1 -5.907953e-05 -4.253829e-04 4.294659e-04 3  3 3  3      633
+4 1  1 1  2 -1 -1  5.408062e-10 -4.834050e-09 4.864207e-09 1  5 1  5      633
+5 1  1 1  2  0  0 -1.995470e-11 -3.206499e-09 3.206561e-09 2  6 2  6      633
+6 1  1 1  2  1  1  5.408062e-10 -4.834050e-09 4.864207e-09 3  7 3  7      633
+  domain_y domain_z fem_degree max_refinements maximumSideLength
+1      633      633          2               1                13
+2      633      633          2               1                13
+3      633      633          2               1                13
+4      633      633          2               1                13
+5      633      633          2               1                13
+6      633      633          2               1                13
+  maximumSideLengthDomain precision
+1                      13     1e-05
+2                      13     1e-05
+3                      13     1e-05
+4                      13     1e-05
+5                      13     1e-05
+6                      13     1e-05</code></pre>
+</div>
+</div>
+</section>
 <section id="convert-to-wide" class="level2">
 <h2 class="anchored" data-anchor-id="convert-to-wide">Convert to wide</h2>
-<p>If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the right indices:</p>
+<p>If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the <a href="indexing.html">combined indices</a> <span class="math inline">\((q,q')\)</span>,</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">tmatrix_wide</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">tmatrix_wide</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>30 x 30 matrix of characters: 
 
                    [,1]              [,2] ...             [,30]
-[1,]  -6.0e-05-4.3e-04i  0.0e+00+0.0e+00i ...  0.0e+00+0.0e+00i
-[2,]   0.0e+00+0.0e+00i -3.3e-05-3.9e-04i ...  0.0e+00+0.0e+00i
+[1,]  -5.9e-05-4.3e-04i  0.0e+00+0.0e+00i ...  0.0e+00+0.0e+00i
+[2,]   0.0e+00+0.0e+00i -3.2e-05-3.8e-04i ...  0.0e+00+0.0e+00i
 [3,]   0.0e+00+0.0e+00i  0.0e+00+0.0e+00i ...  0.0e+00+0.0e+00i
 ...                 ...               ... ...               ...
-[30,]  0.0e+00+0.0e+00i  0.0e+00+0.0e+00i ... -6.5e-09+1.9e-07i</code></pre>
+[30,]  0.0e+00+0.0e+00i  0.0e+00+0.0e+00i ... -6.4e-09+1.7e-07i</code></pre>
 </div>
 </div>
 
