@@ -26,7 +26,7 @@ embedding = (relative_permeability=1.0,
 
 materials = (embedding=embedding,
     Au=(relative_permeability=1.0,
-        relative_permittivity=-11.4 + 1.181im))
+        relative_permittivity=repeat([-11.4 + 1.181im], Nl)))
 
 geometry = (shape="spheroid",
     radiusxy=20.0,

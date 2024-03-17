@@ -19,9 +19,11 @@ polarization = repmat(["electric","magnetic"], 1, 15);
 zeros  = struct('q', zerosq, 'qp', zerosqp);
 
 % materials
-embedding = struct('relative_permeability', 1.0,'relative_permittivity', 1.33^2);
-particle = struct('relative_permeability', 1.0,'relative_permittivity', -11.4+1.181i);
-materialname = 'Au';
+embedding = struct('relative_permeability', 1.0, ...
+                   'relative_permittivity', 1.33^2);
+particle = struct('relative_permeability', 1.0, ...
+                  'relative_permittivity', repmat(-11.4+1.181i, [1,Nl]));
+materialname = 'Au'; 
 materials = struct('embedding', embedding, materialname, particle);
 
 % geometry
