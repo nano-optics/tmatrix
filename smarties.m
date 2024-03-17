@@ -110,4 +110,4 @@ comments = struct('name', 'Au prolate spheroid in water',...
     'script', [mfilename '.m']);
 
 
-[f, uuid] = tmatrix_hdf5('smarties_spectrum.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
+[f, uuid] = tmatrix_hdf5('smarties_spectrum.tmat.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
