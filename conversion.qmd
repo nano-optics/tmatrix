@@ -36,15 +36,24 @@ d <- tmatrix_combinedindex(d)
 head(d)
 ```
 
+## Reading wide data and converting to long format
+
+The function `read_treams()` reads a standard HDF5-stored T-matrix and returns it in long format, including the computation's `method_parameters` fields.
+
+```{r}
+d <- read_treams('data/SPH-DE~4.H5')
+head(d)
+```
+
+
 ## Convert to wide
 
-If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the right indices:
+If we wish to convert to a true matrix representation, the following function adds all the missing zeros and places the entries at the [combined indices](indexing.html) $(q,q')$,
 
 ```{r wide, echo=1}
 w <- tmatrix_wide(d)
 
 prettymat(w, coldots=3)
 ```
-
 
 

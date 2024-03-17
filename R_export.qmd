@@ -25,8 +25,8 @@ zeros <- expand.grid(q=seq(1,30,by=2), qp = seq(1,30,by=2))
 
 embedding <- list('relative_permeability' = 1.0, 'relative_permittivity' = 1.33^2)
 materials <- list('embedding' = embedding, 
-                  'Au' = list('relative_permeability' = 1.0,
-                              'relative_permittivity' = -11.4+1.181i))
+                  'Au' = list('relative_permeability' = 1.0, 
+                              'relative_permittivity' = rep(-11.4+1.181i,Nl)))
 
 geometry <- list('shape' = 'spheroid','radiusxy' = 20.0, 'radiusz' = 40.0)
 

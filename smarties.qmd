@@ -1,55 +1,118 @@
 ---
-title: "SMARTIES T-matrices"
-subtitle: "EBCM for spheroids"
+title: "Exporting SMARTIES T-matrices"
 author: "baptiste"
 date: today
 format: html
+engine: knitr
 ---
 
-Below is an example script to run a SMARTIES simulation at multiple wavelenghts, and export the T-matrices in HDF5. The script is available as [smarties/test_multiple_tmatrix_hdf5.m](smarties/test_multiple_tmatrix_hdf5.m).
+Below is an example script to run many SMARTIES simulations and export the T-matrices in HDF5. The script is available as standalone script [smarties.m](smarties.m).
 
-```{.matlab}
+SMARTIES provides some functions to estimate the maximum multipolar order and number of quadrature points required to reach a desired accuracy. We choose here to fix the relative accuracy to $10^{-10}$ for the orientation-averaged extinction cross-section, which results in higher $lmax$ values for larger and/or more elongated spheroids.
 
+
+```{octave, eval=FALSE}
 path(pathdef); % clear previous path changes
 addpath(genpath('~/Documents/nano-optics/smarties/'));
 addpath(genpath('~/Documents/nano-optics/easyh5/'));
 clearvars;
 
+%% example
 
-%% actual data
+% requested precision (OA Cext)
+accuracy = 1e-10;
 
-% prolate Au spheroid in water (n=1.33), vacuum wavelength 633nm, 
-% epsAu = -11.4+1.181i, semi-axes a=b=20nm, c=40nm, Lmax=3
-wavelength = 600:50:800;
-wavelength = wavelength(:);
+% prolate Au spheroid in water
+% semi-axes a=b=20nm, c=40nm
+wavelength = 600:50:800; wavelength = wavelength(:); 
+Nl = length(wavelength);
 epsilon=epsAu(wavelength);
 medium=1.33;
-stParams.a=20; stParams.c=40;
-stParams.N=3; stParams.nNbTheta=50;
 
+% constant simulation parameters
+stParams.a=20;
+stParams.c=40;
+
+% internal options
 stOptions.bGetR = false;
 stOptions.Delta = 0;
-stOptions.NB = 0;
+stOptions.NB = 0; % NB will be estimated automatically
 stOptions.bGetSymmetricT = false;
-Nl = length(wavelength);
-qmax = 2*(stParams.N*(stParams.N + 1) + stParams.N );
-tmatrix = zeros(qmax, qmax, Nl);
-for i=1:Nl
-stParams.k1=medium*2*pi/wavelength(i); 
-stParams.s=sqrt(epsilon(i)) / medium;
-[~, stT] = slvForT(stParams,stOptions);
-[T, q, qp] = exportTmatrix( stT, true, [], [] );
-ind = sub2ind(size(tmatrix),q,qp,q*0+i);
-tmatrix(ind) =  T(:,7) + 1i*T(:,8);
-end
+stOptions.bOutput = false; % verbosity
+```
 
+We first figure out the maximum convergence parameters required
+
+```{octave, eval=FALSE, echo=-1}
+%% first, figure out the maximum N's needed
+
+globalN = 1;
+globalnNbTheta = 1;
+
+for i=1:Nl
+    stParams.k1=medium*2*pi/wavelength(i);
+    stParams.s=sqrt(epsilon(i)) / medium;
+    % Estimated convergence params
+    [N, nNbTheta] = sphEstimateNandNT(stParams, stOptions, accuracy);
+    stParams.N=N; stParams.nNbTheta=nNbTheta;
+    % Increase params to test accuracy
+    stParams2=stParams;
+    stParams2.N=stParams2.N+5;
+    stParams2.nNbTheta=stParams2.nNbTheta+5;
+
+    [stCoa, stT] = slvForT(stParams,stOptions);
+    [stCoa2, stT2] = slvForT(stParams2,stOptions);
+
+    if(stOptions.bOutput)
+        fprintf('Convergence testing... lambda = %.5g\n', wavelength(i));
+        fprintf('<Cext> = %.10g,   relative error: %.2g\n', stCoa.Cext, abs(stCoa.Cext./stCoa2.Cext-1));
+        fprintf('<Csca> = %.10g,   relative error: %.2g\n', stCoa.Csca, abs(stCoa.Csca./stCoa2.Csca-1));
+        fprintf('<Cabs> = %.10g,   relative error: %.2g\n', stCoa.Cabs, abs(stCoa.Cabs./stCoa2.Cabs-1));
+    end
+
+    if(abs(stCoa.Cext./stCoa2.Cext-1) > 1.1*accuracy)
+        warning('requested precision was not achieved')
+    end
+
+    globalN = max(globalN, stParams.N);
+    globalnNbTheta = max(globalnNbTheta, stParams.nNbTheta);
+end
+```
+
+Next, we redo the calculations for all wavelengths with these fixed parameters.
+
+```{octave, eval=FALSE, echo=-1}
+%% now redo calculations for all wavelengths with these fixed params
+
+% allocate 3D array for all results
+qmax = 2*(globalN*(globalN + 1) + globalN );
+tmatrix = zeros(qmax, qmax, Nl);
+
+for i=1:Nl
+    stParams.k1=medium*2*pi/wavelength(i);
+    stParams.s=sqrt(epsilon(i)) / medium;
+
+    stParams.N=globalN; stParams.nNbTheta=globalnNbTheta;
+
+    [stCoa, stT] = slvForT(stParams,stOptions);
+
+    [T, q, qp] = exportTmatrix( stT, true, [], [] );
+    ind = sub2ind(size(tmatrix),q,qp,q*0+i);
+    tmatrix(ind) =  T(:,7) + 1i*T(:,8);
+
+end
+```
+
+Finally, we export the data into HDF5.
+
+```{octave, eval=FALSE, echo=-1}
+%% data to export
 vecq = 1:qmax;
 vecs = [repmat(1,1, qmax/2), repmat(2,1, qmax/2)];
 vecp = vecq - (vecs - 1) * qmax/2;
 vecl = floor(sqrt(vecp));
 vecm = vecp - vecl.*(vecl + 1);
 
-%% data to export
 
 polars = ["electric","magnetic"];
 modes = struct('l', int16(vecl),'m', int16(vecm), 'polarization', polars(vecs));
@@ -63,19 +126,20 @@ computation = struct('method','EBCM',...
     'software','SMARTIES',...
     'version','1.1',...
     'unit','nm', ...
-    'Lmax', stParams.N, ...
-    'Ntheta', stParams.nNbTheta, ...
-    'accuracy','1e-10');
+    'Lmax', globalN, ...
+    'Ntheta', globalnNbTheta, ...
+    'accuracy', accuracy);
 
 comments = struct('name', 'Au prolate spheroid in water',...
     'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids',...
     'keywords', 'gold, spheroid, ebcm', ...
-    'script', 'test_export.m');
+    'script', [mfilename '.m']);
 
 
-[f, uuid] = tmatrix_hdf5('exporting_multiple.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
+[f, uuid] = tmatrix_hdf5('smarties_spectrum.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
 ```
 
+Output file: [smarties_spectrum.h5](smarties_spectrum.h5)
 
-
-
+`r library(knitr);library(xfun);f=knitr::current_input();print(f)`
+`r invisible(purl(with_ext(f, "qmd"),output=with_ext(f, "m")))`

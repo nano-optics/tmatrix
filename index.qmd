@@ -12,10 +12,12 @@ Collection of scripts and self-contained examples to export/import T-matrices.
 - Doc: [Matlab](matlab_export.html) • Script: [test_dummy.m](test_dummy.m) • Output: [am.tmat.h5](am.tmat.h5)
 - Doc: [Julia](julia_export.html) • Script: [test_dummy.jl](test_dummy.jl) • Output: [aj.tmat.h5](aj.tmat.h5)
 
-## Displaying T-matrices
+## Misc. utilities
 
+- [Conversion](conversion.html)
 - [Display](display.html)
+- [Indexing](indexing.html)
 
 ## SMARTIES examples
 
-- [Smarties](smarties.html)
+- Doc: [Smarties](smarties.html) • Script: [smarties.m](smarties.m) • Output: [smarties_spectrum.h5](smarties_spectrum.h5)
