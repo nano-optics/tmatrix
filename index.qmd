@@ -20,4 +20,5 @@ Collection of scripts and self-contained examples to export/import T-matrices.
 
 ## SMARTIES examples
 
-- Doc: [Smarties](smarties.html) • Script: [smarties.m](smarties.m) • Output: [smarties_spectrum.h5](smarties_spectrum.h5)
+- Doc: [Smarties](smarties.html) • Script: [smarties.m](smarties.m) • Output: [smarties_spectrum.tmat.h5](smarties_spectrum.tmat.h5)
+- Batch example: [smarties_batch](smarties_batch.html)

@@ -24,7 +24,9 @@ website:
       - text: "Displaying T-matrices"
         file: display.qmd
       - text: "SMARTIES"
-        file: smarties.qmd
+        menu:
+        - smarties.qmd
+        - smarties_batch.qmd
 
 format:
   html:

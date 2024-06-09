@@ -132,14 +132,15 @@ computation = struct('method','EBCM',...
 
 comments = struct('name', 'Au prolate spheroid in water',...
     'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids',...
+    'sources', 'Au from Raschke et al 10.1103/PhysRevB.86.235147',...
     'keywords', 'gold, spheroid, ebcm', ...
     'script', [mfilename '.m']);
 
 
-[f, uuid] = tmatrix_hdf5('smarties_spectrum.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
+[f, uuid] = tmatrix_hdf5('smarties_spectrum.tmat.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
 ```
 
-Output file: [smarties_spectrum.h5](smarties_spectrum.h5)
+Output file: [smarties_spectrum.tmat.h5](smarties_spectrum.tmat.h5)
 
-`r library(knitr);library(xfun);f=knitr::current_input();print(f)`
-`r invisible(purl(with_ext(f, "qmd"),output=with_ext(f, "m")))`
+`r library(knitr);library(xfun);f=knitr::current_input();`
+`r invisible(purl(with_ext(f, "qmd"),output=paste0("smarties/",with_ext(f, "m"))))`
