@@ -102,7 +102,7 @@
     "href": "index.html#examples-of-export-with-dummy-data",
     "title": "T-matrix",
     "section": "Examples of export with dummy data",
-    "text": "Examples of export with dummy data\n\nDoc: Julia • Script: test_dummy.jl • Output: aj.tmat.h5\nDoc: Matlab • Script: export_matlab.m • Output: am.tmat.h5\nDoc: Python • Script: export_python.py • Output: ap.tmat.h5\nDoc: R • Script: export_R.R • Output: ar.tmat.h5"
+    "text": "Examples of export with dummy data\n\nDoc: Julia • Script: export_julia.jl • Output: aj.tmat.h5\nDoc: Matlab • Script: export_matlab.m • Output: am.tmat.h5\nDoc: Python • Script: export_python.py • Output: ap.tmat.h5\nDoc: R • Script: export_R.R • Output: ar.tmat.h5"
   },
   {
     "objectID": "index.html#misc.-utilities",
