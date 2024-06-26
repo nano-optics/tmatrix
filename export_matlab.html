@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="baptiste">
-<meta name="dcterms.date" content="2024-06-26">
+<meta name="dcterms.date" content="2024-06-27">
 
 <title>T-matrix – Export to ‘.tmat.h5’ format with Matlab</title>
 <style>
@@ -248,7 +248,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 26, 2024</p>
+      <p class="date">June 27, 2024</p>
     </div>
   </div>
   
@@ -385,6 +385,56 @@ window.Quarto = {
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="va">h5writeatt</span>(<span class="va">f</span><span class="op">,</span> <span class="ss">'/computation'</span><span class="op">,</span> <span class="ss">'version'</span><span class="op">,</span> <span class="ss">'1.1'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- export the code into standalone file -->
+<p><em>Summary of the file:</em></p>
+<pre><code>&lt;list&gt;
+├─data: &lt;list&gt;
+│ ├─computation: &lt;list&gt;
+│ │ ├─files: &lt;list&gt;
+│ │ │ └─script: "% possibly multiple wavelengths↵..."
+│ │ └─method_parameters: &lt;list&gt;
+│ │   ├─Lmax: 3
+│ │   └─Ntheta: 100
+│ ├─embedding: &lt;list&gt;
+│ │ ├─relative_permeability: 1
+│ │ └─relative_permittivity: 1.7689
+│ ├─modes: &lt;list&gt;
+│ │ ├─l&lt;int [30]&gt;: 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, ...
+│ │ ├─m&lt;int [30]&gt;: -1, -1, 0, 0, 1, 1, -2, -2, -1, -1, ...
+│ │ └─polarization&lt;chr [30]&gt;: "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", ...
+│ ├─scatterer: &lt;list&gt;
+│ │ ├─geometry: &lt;list&gt;
+│ │ │ ├─radiusxy: 20
+│ │ │ └─radiusz: 40
+│ │ └─material: &lt;list&gt;
+│ │   ├─relative_permeability: 1
+│ │   └─relative_permittivity&lt;cpl [9]&gt;: -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i
+│ ├─tmatrix&lt;cpl [8,100]&gt;: 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 31+31i, ...
+│ └─vacuum_wavelength&lt;dbl [9]&gt;: 400, 450, 500, 550, 600, 650, 700, 750, 800
+└─attributes: &lt;list&gt;
+  ├─root: &lt;list&gt;
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─keywords: "gold, spheroid, ebcm, passive, r..."
+  │ ├─name: "Au prolate spheroid in water"
+  │ └─storage_format_version: "v0.01"
+  ├─vacuum_wavelength: &lt;list&gt;
+  │ └─unit: "nm"
+  ├─computation: &lt;list&gt;
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─method: "EBCM, Extended Boundary Conditio..."
+  │ ├─name: "SMARTIES"
+  │ ├─software: "SMARTIES"
+  │ └─version: "1.1"
+  ├─embedding: &lt;list&gt;
+  │ ├─keywords: "non-dispersive"
+  │ └─name: "H2O, Water"
+  ├─material: &lt;list&gt;
+  │ ├─keywords: "dispersive, plasmonic"
+  │ ├─name: "Au, Gold"
+  │ └─reference: "Au from Raschke et al 10.1103/Ph..."
+  └─geometry: &lt;list&gt;
+    ├─name: "homogeneous spheroid with symmet..."
+    ├─shape: "spheroid"
+    └─unit: "nm"</code></pre>
 
 
 </section>

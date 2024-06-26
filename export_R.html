@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="baptiste">
-<meta name="dcterms.date" content="2024-06-26">
+<meta name="dcterms.date" content="2024-06-27">
 
 <title>T-matrix – Export to ‘.tmat.h5’ format with R</title>
 <style>
@@ -248,7 +248,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 26, 2024</p>
+      <p class="date">June 27, 2024</p>
     </div>
   </div>
   
@@ -321,8 +321,7 @@ window.Quarto = {
 <span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>computation <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">method_parameters =</span> <span class="fu">list</span>(<span class="st">'Lmax'</span> <span class="ot">=</span> Lmax, </span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>                                             <span class="st">'Ntheta'</span> <span class="ot">=</span> <span class="dv">100</span>),</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                    <span class="at">files =</span> <span class="fu">list</span>(<span class="at">script =</span> <span class="fu">paste</span>(<span class="fu">readLines</span>(<span class="st">'export_R.R'</span>), </span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                                                <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                    <span class="at">files =</span> <span class="fu">list</span>(<span class="at">script =</span> <span class="fu">paste</span>(<span class="fu">readLines</span>(<span class="st">'export_R.R'</span>), <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="saving-to-hdf5" class="level2">
@@ -399,6 +398,57 @@ window.Quarto = {
 <span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Fclose</span>(fid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- export the code into standalone file -->
+<p><em>Summary of the file:</em></p>
+<pre><code>&lt;list&gt;
+├─data: &lt;list&gt;
+│ ├─computation: &lt;list&gt;
+│ │ ├─files: &lt;list&gt;
+│ │ │ └─script: "## ----eval=FALSE---------------..."
+│ │ └─method_parameters: &lt;list&gt;
+│ │   ├─Lmax: 3
+│ │   └─Ntheta: 100
+│ ├─embedding: &lt;list&gt;
+│ │ ├─relative_permeability: 1
+│ │ └─relative_permittivity: 1.7689
+│ ├─modes: &lt;list&gt;
+│ │ ├─l&lt;int [30]&gt;: 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, ...
+│ │ ├─m&lt;int [30]&gt;: -1, -1, 0, 0, 1, 1, -2, -2, -1, -1, ...
+│ │ └─polarization&lt;chr [30]&gt;: "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", ...
+│ ├─scatterer: &lt;list&gt;
+│ │ ├─geometry: &lt;list&gt;
+│ │ │ ├─radiusxy: 20
+│ │ │ └─radiusz: 40
+│ │ └─material: &lt;list&gt;
+│ │   ├─relative_permeability: 1
+│ │   └─relative_permittivity&lt;cpl [9]&gt;: -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i
+│ ├─tmatrix&lt;cpl [8,100]&gt;: 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 31+31i, ...
+│ └─vacuum_wavelength&lt;dbl [9]&gt;: 400, 450, 500, 550, 600, 650, 700, 750, 800
+└─attributes: &lt;list&gt;
+  ├─root: &lt;list&gt;
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─keywords: "gold, spheroid, ebcm, passive, r..."
+  │ ├─name: "Au prolate spheroid in water"
+  │ └─storage_format_version: "v0.01"
+  ├─vacuum_wavelength: &lt;list&gt;
+  │ ├─rhdf5-NA.OK: 1
+  │ └─unit: "nm"
+  ├─computation: &lt;list&gt;
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─method: "EBCM, Extended Boundary Conditio..."
+  │ ├─name: "SMARTIES"
+  │ ├─software: "SMARTIES"
+  │ └─version: "1.1"
+  ├─embedding: &lt;list&gt;
+  │ ├─keywords: "non-dispersive"
+  │ └─name: "H2O, Water"
+  ├─material: &lt;list&gt;
+  │ ├─keywords: "dispersive, plasmonic"
+  │ ├─name: "Au, Gold"
+  │ └─reference: "Au from Raschke et al 10.1103/Ph..."
+  └─geometry: &lt;list&gt;
+    ├─name: "homogeneous spheroid with symmet..."
+    ├─shape: "spheroid"
+    └─unit: "nm"</code></pre>
 
 
 </section>

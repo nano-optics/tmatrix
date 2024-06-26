@@ -50,8 +50,7 @@ scatterer <- list(material = list('relative_permeability' = 1.0,
 
 computation <- list(method_parameters = list('Lmax' = Lmax, 
                                              'Ntheta' = 100),
-                    files = list(script = paste(readLines('export_R.R'), 
-                                                collapse = "\n")))
+                    files = list(script = paste(readLines('export_R.R'), collapse = "\n")))
 
 
 

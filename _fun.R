@@ -1,3 +1,39 @@
+library(rhdf5) # note: dev version to support complex
+library(purrr) # mapping functions
+library(lobstr) # viewing functions
+
+# custom_inline_hook <- function (x) 
+# {
+#   if (is.numeric(x)) 
+#     x = round_digits(x)
+#   paste(as.character(x), collapse = ", ")
+# }
+
+
+check_h5 <- function(f){
+  d <- h5dump(f, read.attributes = T, native=TRUE,drop=TRUE )
+  
+  a <- list(root = rhdf5::h5readAttributes(f,'/'),
+            vacuum_wavelength = rhdf5::h5readAttributes(f,'vacuum_wavelength'),
+            computation = rhdf5::h5readAttributes(f,'computation'),
+            embedding = rhdf5::h5readAttributes(f,'embedding'),
+            material = rhdf5::h5readAttributes(f,'scatterer/material'),
+            geometry = rhdf5::h5readAttributes(f,'scatterer/geometry'))
+  
+  r <- list(data = d, attributes = a)
+  # 
+  # tmp <- tempfile()
+  # zz <- file(tmp, open = "wt")
+  # sink(zz)
+  # print()
+  # sink()
+  # close(zz)
+  # txt <- paste(readLines(tmp))
+  # unlink(tmp)
+  # txt
+  r
+}
+
 
 write_attributes <- function(object, names, attributes, 
                              type=c("root","dataset","group")){
