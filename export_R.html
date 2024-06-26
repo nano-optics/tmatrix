@@ -9,7 +9,7 @@
 <meta name="author" content="baptiste">
 <meta name="dcterms.date" content="2024-06-26">
 
-<title>T-matrix – Exporting SMARTIES T-matrices</title>
+<title>T-matrix – Export to ‘.tmat.h5’ format with R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -216,15 +216,22 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#mockup-input-data" id="toc-mockup-input-data" class="nav-link active" data-scroll-target="#mockup-input-data">Mockup input data</a></li>
+  <li><a href="#saving-to-hdf5" id="toc-saving-to-hdf5" class="nav-link" data-scroll-target="#saving-to-hdf5">Saving to HDF5</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Exporting SMARTIES T-matrices</h1>
+<h1 class="title">Export to ‘.tmat.h5’ format with R</h1>
 </div>
 
 
@@ -253,130 +260,148 @@ window.Quarto = {
 </header>
 
 
-<p>Below is an example script to run many SMARTIES simulations and export the T-matrices in HDF5. The script is available as standalone script <a href="smarties.m">smarties.m</a>.</p>
-<p>SMARTIES provides some functions to estimate the maximum multipolar order and number of quadrature points required to reach a desired accuracy. We choose here to fix the relative accuracy to <span class="math inline">\(10^{-10}\)</span> for the orientation-averaged extinction cross-section, which results in higher <span class="math inline">\(lmax\)</span> values for larger and/or more elongated spheroids.</p>
+<p>This document showcases a basic R script to export T-matrices in the <code>.tmat.h5</code> HDF5 format. For illustration, we start by producing a dummy dataset. This minimal reproducible example file is available for download as a standalone script: <a href="export_R.R">export_R.R</a>.</p>
+<section id="mockup-input-data" class="level2">
+<h2 class="anchored" data-anchor-id="mockup-input-data">Mockup input data</h2>
+<p>Consistent with the other examples, we generate a <code>50x30x30</code> array of dummy data, which repeats 50 times (50 wavelengths) a matrix of 900 entries ranging from <span class="math inline">\(1+1i\)</span> (first element, top left) to <span class="math inline">\(900 + 900i\)</span> (last element, bottom right). Note the expectation of <strong>row-major</strong> ordering in HDF5. The <code>3x3</code> top-left block is</p>
+<pre><code>   1.0000 + 1.0000i   2.0000 + 2.0000i   3.0000 + 3.0000i ...
+  31.0000 +31.0000i  32.0000 +32.0000i  33.0000 +33.0000i ...
+  61.0000 +61.0000i  62.0000 +62.0000i  63.0000 +63.0000i ...
+   ...               ...                ...               ...</code></pre>
+<p>The <code>rhdf5</code> package has support for a variety of R objects, including lists which are automatically written as grouped objects in HDF5.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">path</span>(<span class="fu">pathdef</span>)<span class="op">;</span> <span class="co">% clear previous path changes</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">addpath</span>(<span class="fu">genpath</span>(<span class="st">'~/Documents/nano-optics/smarties/'</span>))<span class="op">;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">addpath</span>(<span class="fu">genpath</span>(<span class="st">'~/Documents/nano-optics/easyh5/'</span>))<span class="op">;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>clearvars<span class="op">;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">%% example</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">% requested precision (OA Cext)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> <span class="fl">1e-10</span><span class="op">;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">% prolate Au spheroid in water</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">% semi-axes a=b=20nm, c=40nm</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>wavelength <span class="op">=</span> <span class="fl">600</span><span class="op">:</span><span class="fl">50</span><span class="op">:</span><span class="fl">800</span><span class="op">;</span> wavelength <span class="op">=</span> wavelength(<span class="op">:</span>)<span class="op">;</span> </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Nl <span class="op">=</span> <span class="fu">length</span>(wavelength)<span class="op">;</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>epsilon<span class="op">=</span>epsAu(wavelength)<span class="op">;</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>medium<span class="op">=</span><span class="fl">1.33</span><span class="op">;</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">% constant simulation parameters</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>stParams.a<span class="op">=</span><span class="fl">20</span><span class="op">;</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>stParams.c<span class="op">=</span><span class="fl">40</span><span class="op">;</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">% internal options</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>stOptions.bGetR <span class="op">=</span> <span class="fu">false</span><span class="op">;</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>stOptions.Delta <span class="op">=</span> <span class="fl">0</span><span class="op">;</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>stOptions.NB <span class="op">=</span> <span class="fl">0</span><span class="op">;</span> <span class="co">% NB will be estimated automatically</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>stOptions.bGetSymmetricT <span class="op">=</span> <span class="fu">false</span><span class="op">;</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>stOptions.bOutput <span class="op">=</span> <span class="fu">false</span><span class="op">;</span> <span class="co">% verbosity</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>We first figure out the maximum convergence parameters required</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>globalN <span class="op">=</span> <span class="fl">1</span><span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>globalnNbTheta <span class="op">=</span> <span class="fl">1</span><span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="fu">i</span><span class="op">=</span><span class="fl">1</span><span class="op">:</span>Nl</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    stParams.k1<span class="op">=</span>medium<span class="op">*</span><span class="fl">2</span><span class="op">*</span><span class="bu">pi</span><span class="op">/</span>wavelength(<span class="fu">i</span>)<span class="op">;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    stParams.s<span class="op">=</span><span class="fu">sqrt</span>(epsilon(<span class="fu">i</span>)) <span class="op">/</span> medium<span class="op">;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">% Estimated convergence params</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    [N<span class="op">,</span> nNbTheta] <span class="op">=</span> sphEstimateNandNT(stParams<span class="op">,</span> stOptions<span class="op">,</span> accuracy)<span class="op">;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    stParams.N<span class="op">=</span>N<span class="op">;</span> stParams.nNbTheta<span class="op">=</span>nNbTheta<span class="op">;</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">% Increase params to test accuracy</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    stParams2<span class="op">=</span>stParams<span class="op">;</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    stParams2.N<span class="op">=</span>stParams2.N<span class="op">+</span><span class="fl">5</span><span class="op">;</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    stParams2.nNbTheta<span class="op">=</span>stParams2.nNbTheta<span class="op">+</span><span class="fl">5</span><span class="op">;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    [stCoa<span class="op">,</span> stT] <span class="op">=</span> slvForT(stParams<span class="op">,</span>stOptions)<span class="op">;</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    [stCoa2<span class="op">,</span> stT2] <span class="op">=</span> slvForT(stParams2<span class="op">,</span>stOptions)<span class="op">;</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(stOptions.bOutput)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fprintf</span>(<span class="st">'Convergence testing... lambda = %.5g\n'</span><span class="op">,</span> wavelength(<span class="fu">i</span>))<span class="op">;</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fprintf</span>(<span class="st">'&lt;Cext&gt; = %.10g,   relative error: %.2g\n'</span><span class="op">,</span> stCoa.Cext<span class="op">,</span> <span class="fu">abs</span>(stCoa.Cext<span class="op">./</span>stCoa2.Cext<span class="op">-</span><span class="fl">1</span>))<span class="op">;</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fprintf</span>(<span class="st">'&lt;Csca&gt; = %.10g,   relative error: %.2g\n'</span><span class="op">,</span> stCoa.Csca<span class="op">,</span> <span class="fu">abs</span>(stCoa.Csca<span class="op">./</span>stCoa2.Csca<span class="op">-</span><span class="fl">1</span>))<span class="op">;</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fprintf</span>(<span class="st">'&lt;Cabs&gt; = %.10g,   relative error: %.2g\n'</span><span class="op">,</span> stCoa.Cabs<span class="op">,</span> <span class="fu">abs</span>(stCoa.Cabs<span class="op">./</span>stCoa2.Cabs<span class="op">-</span><span class="fl">1</span>))<span class="op">;</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rhdf5) <span class="co"># note: dev version to support complex</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(uuid) <span class="co"># uuid</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue) <span class="co"># string interpolation</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr) <span class="co"># mapping functions</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">## dummy data</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># possibly multiple wavelengths</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>wavelength <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">400</span>, <span class="dv">800</span>, <span class="at">by=</span><span class="dv">50</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>Nl <span class="ot">&lt;-</span> <span class="fu">length</span>(wavelength)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Lmax <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>qmax <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span>(Lmax<span class="sc">*</span>(Lmax<span class="sc">+</span><span class="dv">1</span>)<span class="sc">+</span>Lmax) <span class="co"># T-matrix size</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># dummy 30x30 matrix values for each wavelength</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># note the byrow due to HDF5 expecting</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># row-major ordering vs R's default column-major</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>tdata <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span>qmax<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">1</span>i<span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span>qmax<span class="sc">^</span><span class="dv">2</span>), qmax, qmax, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>tmatrix <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA_complex_</span>, <span class="fu">c</span>(Nl,qmax,qmax))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_len</span>(Nl))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  tmatrix[i,,] <span class="ot">&lt;-</span> tdata</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>tmatrix[<span class="dv">1</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">abs</span>(stCoa.Cext<span class="op">./</span>stCoa2.Cext<span class="op">-</span><span class="fl">1</span>) <span class="op">&gt;</span> <span class="fl">1.1</span><span class="op">*</span>accuracy)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">warning</span>(<span class="st">'requested precision was not achieved'</span>)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>modes <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">l =</span> <span class="fu">rep</span>(<span class="cn">NA_integer_</span>, qmax),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>              <span class="at">m =</span> <span class="fu">rep</span>(<span class="cn">NA_integer_</span>, qmax),</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>              <span class="at">polarization =</span> <span class="fu">rep</span>(<span class="cn">NA_character_</span>, qmax))</span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    globalN <span class="op">=</span> <span class="fu">max</span>(globalN<span class="op">,</span> stParams.N)<span class="op">;</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    globalnNbTheta <span class="op">=</span> <span class="fu">max</span>(globalnNbTheta<span class="op">,</span> stParams.nNbTheta)<span class="op">;</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (li <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Lmax){</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (mi <span class="cf">in</span> <span class="sc">-</span>li<span class="sc">:</span>li){</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (si <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"electric"</span>, <span class="st">"magnetic"</span>)){</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      modes<span class="sc">$</span>l[i] <span class="ot">&lt;-</span> li</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      modes<span class="sc">$</span>m[i] <span class="ot">&lt;-</span> mi</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      modes<span class="sc">$</span>polarization[i] <span class="ot">&lt;-</span> si</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      i <span class="ot">&lt;-</span>  i<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>embedding <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'relative_permeability'</span> <span class="ot">=</span> <span class="fl">1.0</span>, </span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>                  <span class="st">'relative_permittivity'</span> <span class="ot">=</span> <span class="fl">1.33</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>scatterer <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">material =</span> <span class="fu">list</span>(<span class="st">'relative_permeability'</span> <span class="ot">=</span> <span class="fl">1.0</span>, </span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">'relative_permittivity'</span> <span class="ot">=</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">11.4+1.181</span>i,Nl)),</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>                  <span class="at">geometry =</span> <span class="fu">list</span>(<span class="st">'radiusxy'</span> <span class="ot">=</span> <span class="fl">20.0</span>, </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">'radiusz'</span> <span class="ot">=</span> <span class="fl">40.0</span>))</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>computation <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">method_parameters =</span> <span class="fu">list</span>(<span class="st">'Lmax'</span> <span class="ot">=</span> Lmax, </span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>                                             <span class="st">'Ntheta'</span> <span class="ot">=</span> <span class="dv">100</span>),</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                    <span class="at">files =</span> <span class="fu">list</span>(<span class="at">script =</span> <span class="fu">paste</span>(<span class="fu">readLines</span>(<span class="st">'export_R.R'</span>), </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                                                <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Next, we redo the calculations for all wavelengths with these fixed parameters.</p>
+</section>
+<section id="saving-to-hdf5" class="level2">
+<h2 class="anchored" data-anchor-id="saving-to-hdf5">Saving to HDF5</h2>
+<p>The <code>rhdf5</code> package provides support for reading/writing HDF5 files into/from R objects. Until my <a href="https://support.bioconductor.org/p/9156305/#9156408">recent request</a>, complex arrays were not supported, but this is now implemented in the dev version of the package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">% allocate 3D array for all results</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>qmax <span class="op">=</span> <span class="fl">2</span><span class="op">*</span>(globalN<span class="op">*</span>(globalN <span class="op">+</span> <span class="fl">1</span>) <span class="op">+</span> globalN )<span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tmatrix <span class="op">=</span> <span class="fu">zeros</span>(qmax<span class="op">,</span> qmax<span class="op">,</span> Nl)<span class="op">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="fu">i</span><span class="op">=</span><span class="fl">1</span><span class="op">:</span>Nl</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    stParams.k1<span class="op">=</span>medium<span class="op">*</span><span class="fl">2</span><span class="op">*</span><span class="bu">pi</span><span class="op">/</span>wavelength(<span class="fu">i</span>)<span class="op">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    stParams.s<span class="op">=</span><span class="fu">sqrt</span>(epsilon(<span class="fu">i</span>)) <span class="op">/</span> medium<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    stParams.N<span class="op">=</span>globalN<span class="op">;</span> stParams.nNbTheta<span class="op">=</span>globalnNbTheta<span class="op">;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    [stCoa<span class="op">,</span> stT] <span class="op">=</span> slvForT(stParams<span class="op">,</span>stOptions)<span class="op">;</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    [T<span class="op">,</span> q<span class="op">,</span> <span class="fu">qp</span>] <span class="op">=</span> exportTmatrix( stT<span class="op">,</span> <span class="fu">true</span><span class="op">,</span> []<span class="op">,</span> [] )<span class="op">;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    ind <span class="op">=</span> <span class="fu">sub2ind</span>(<span class="fu">size</span>(tmatrix)<span class="op">,</span>q<span class="op">,</span><span class="fu">qp</span><span class="op">,</span>q<span class="op">*</span><span class="fl">0</span><span class="op">+</span><span class="fu">i</span>)<span class="op">;</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    tmatrix(ind) <span class="op">=</span>  T(<span class="op">:,</span><span class="fl">7</span>) <span class="op">+</span> <span class="fl">1i</span><span class="op">*</span>T(<span class="op">:,</span><span class="fl">8</span>)<span class="op">;</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rhdf5) <span class="co"># note: requires dev version to support complex arrays</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># cf https://support.bioconductor.org/p/9156305/#9156408</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># remotes::install_github("grimbough/rhdf5@devel")</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># may need 'crypto' library from openSSL to compile</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g. via brew install openssl on macos</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Finally, we export the data into HDF5.</p>
+<p>We can then write the different objects defined above using <code>hwrite</code>. Note the important <code>native = TRUE</code> parameter for the T-matrix data: R stores arrays column-wise, while HDF5 uses row-major ordering. To avoid confusion between different programming languages, we suggest sticking with the native HDF5 convention (<code>native = TRUE</code> ensures that the array is written transposed).</p>
+<p>Attributes don’t seem to have a convenient high-level interface, and unfortunately they need to be written slightly differently for the root level, datasets, and groups.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode octave code-with-copy"><code class="sourceCode octave"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>vecq <span class="op">=</span> <span class="fl">1</span><span class="op">:</span>qmax<span class="op">;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>vecs <span class="op">=</span> [<span class="fu">repmat</span>(<span class="fl">1</span><span class="op">,</span><span class="fl">1</span><span class="op">,</span> qmax<span class="op">/</span><span class="fl">2</span>)<span class="op">,</span> <span class="fu">repmat</span>(<span class="fl">2</span><span class="op">,</span><span class="fl">1</span><span class="op">,</span> qmax<span class="op">/</span><span class="fl">2</span>)]<span class="op">;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>vecp <span class="op">=</span> vecq <span class="op">-</span> (vecs <span class="op">-</span> <span class="fl">1</span>) <span class="op">*</span> qmax<span class="op">/</span><span class="fl">2</span><span class="op">;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>vecl <span class="op">=</span> <span class="fu">floor</span>(<span class="fu">sqrt</span>(vecp))<span class="op">;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>vecm <span class="op">=</span> vecp <span class="op">-</span> vecl<span class="op">.*</span>(vecl <span class="op">+</span> <span class="fl">1</span>)<span class="op">;</span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="st">'ar.tmat.h5'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(f) <span class="co"># delete previous file if it exists</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">h5createFile</span>(f)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">h5closeAll</span>() <span class="co"># in case connections open</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>polars <span class="op">=</span> [<span class="st">"electric"</span><span class="op">,</span><span class="st">"magnetic"</span>]<span class="op">;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>modes <span class="op">=</span> <span class="fu">struct</span>(<span class="st">'l'</span><span class="op">,</span> <span class="fu">int16</span>(vecl)<span class="op">,</span><span class="st">'m'</span><span class="op">,</span> <span class="fu">int16</span>(vecm)<span class="op">,</span> <span class="st">'polarization'</span><span class="op">,</span> polars(vecs))<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(wavelength, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/vacuum_wavelength"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(tmatrix, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/tmatrix"</span>, <span class="at">native=</span><span class="cn">TRUE</span>) <span class="co"># store rowwise</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fu">struct</span>(<span class="st">'embedding'</span><span class="op">,</span> medium<span class="op">^</span><span class="fl">2</span><span class="op">,</span> <span class="st">'Au'</span><span class="op">,</span> epsilon)<span class="op">;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>geometry <span class="op">=</span> <span class="fu">struct</span>(<span class="st">'description'</span><span class="op">,</span>  <span class="st">'prolate spheroid'</span><span class="op">,</span> <span class="op">...</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'shape'</span><span class="op">,</span> <span class="st">'spheroid'</span><span class="op">,</span><span class="st">'radiusxy'</span><span class="op">,</span> stParams.a<span class="op">,</span> <span class="st">'radiusz'</span><span class="op">,</span> stParams.c)<span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(modes, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/modes'</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(embedding, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/embedding"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(scatterer, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/scatterer"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(computation, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/computation'</span>)</span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>computation <span class="op">=</span> <span class="fu">struct</span>(<span class="st">'method'</span><span class="op">,</span><span class="st">'EBCM'</span><span class="op">,...</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">'software'</span><span class="op">,</span><span class="st">'SMARTIES'</span><span class="op">,...</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'version'</span><span class="op">,</span><span class="st">'1.1'</span><span class="op">,...</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'unit'</span><span class="op">,</span><span class="st">'nm'</span><span class="op">,</span> <span class="op">...</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Lmax'</span><span class="op">,</span> globalN<span class="op">,</span> <span class="op">...</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Ntheta'</span><span class="op">,</span> globalnNbTheta<span class="op">,</span> <span class="op">...</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">'accuracy'</span><span class="op">,</span> accuracy)<span class="op">;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## write attributes</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>fid <span class="ot">&lt;-</span> <span class="fu">H5Fopen</span>(f)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># root level</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au prolate spheroid in water"</span>, fid, <span class="st">"name"</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, fid, <span class="st">"description"</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"</span>, fid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"v0.01"</span>, fid, <span class="st">"storage_format_version"</span>)</span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>comments <span class="op">=</span> <span class="fu">struct</span>(<span class="st">'name'</span><span class="op">,</span> <span class="st">'Au prolate spheroid in water'</span><span class="op">,...</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'description'</span><span class="op">,</span> <span class="st">'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids'</span><span class="op">,...</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'sources'</span><span class="op">,</span> <span class="st">'Au from Raschke et al 10.1103/PhysRevB.86.235147'</span><span class="op">,...</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">'keywords'</span><span class="op">,</span> <span class="st">'gold, spheroid, ebcm'</span><span class="op">,</span> <span class="op">...</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'script'</span><span class="op">,</span> [<span class="fu">mfilename</span> <span class="st">'.m'</span>])<span class="op">;</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>[f<span class="op">,</span> uuid] <span class="op">=</span> tmatrix_hdf5(<span class="st">'smarties_spectrum.tmat.h5'</span><span class="op">,</span> tmatrix<span class="op">,</span> modes<span class="op">,</span> wavelength<span class="op">,</span> epsilon<span class="op">,</span> geometry<span class="op">,</span> computation<span class="op">,</span> comments)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># wavelength</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>did <span class="ot">&lt;-</span> <span class="fu">H5Dopen</span>(fid, <span class="st">"vacuum_wavelength"</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, did, <span class="st">"unit"</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Dclose</span>(did)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># embedding</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"embedding"</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"H2O, Water"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"non-dispersive"</span>, gid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># material</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/material"</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au, Gold"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"dispersive, plasmonic"</span>, gid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au from Raschke et al 10.1103/PhysRevB.86.235147"</span>, gid, <span class="st">"reference"</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co"># geometry</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/geometry"</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, gid, <span class="st">"unit"</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"spheroid"</span>, gid, <span class="st">"shape"</span>)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"homogeneous spheroid with symmetry axis z"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="co"># computation</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"computation"</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"EBCM, Extended Boundary Condition Method"</span>, gid, <span class="st">"method"</span>)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, gid, <span class="st">"description"</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"software"</span>)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"1.1"</span>, gid, <span class="st">"version"</span>)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Fclose</span>(fid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Output file: <a href="smarties_spectrum.tmat.h5">smarties_spectrum.tmat.h5</a></p>
+<!-- export the code into standalone file -->
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

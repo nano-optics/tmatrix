@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="baptiste">
-<meta name="dcterms.date" content="2024-06-26">
 
-<title>T-matrix – Indexing conventions</title>
+<title>T-matrix – blurb</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -25,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -69,37 +67,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -109,7 +78,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">T-matrix</span>
     </a>
   </div>
@@ -130,15 +99,15 @@ window.Quarto = {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./conversion.html"> 
+    <a class="nav-link" href="../conversion.html"> 
 <span class="menu-text">Conversion long/wide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./indexing.html" aria-current="page"> 
+    <a class="nav-link" href="../indexing.html"> 
 <span class="menu-text">Indexing reference</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./display.html"> 
+    <a class="nav-link" href="../display.html"> 
 <span class="menu-text">Displaying T-matrices</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -147,11 +116,11 @@ window.Quarto = {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-smarties">    
         <li>
-    <a class="dropdown-item" href="./smarties.html">
+    <a class="dropdown-item" href="../smarties.html">
  <span class="dropdown-text">Exporting SMARTIES T-matrices</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./smarties_batch.html">
+    <a class="dropdown-item" href="../smarties_batch.html">
  <span class="dropdown-text">Calculating many SMARTIES T-matrices</span></a>
   </li>  
     </ul>
@@ -188,292 +157,118 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Indexing conventions</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
+<p>== SMARTIES</p>
+<p>The original T-matrix method, devised by Waterman [ref], introduced alongside a specific calculation scheme – the Extended Boundary Condition Method. This technique has strong analytical roots, requiring no meshing of the particle’s volume or surface and, instead, computes T-matrix elements via analytical formulas which reduce to Mie theory for spherical particles [ref]. For other shapes, the computation requires integration over the particle surface, by numerical quadrature. For axi-symmetric particles, the method is remarkably efficient as the matrix elements are obtained via simple one-dimensional integrals. The EBCM method is particularly popular for simple geometrical shapes, where it typically provides the fastest and most accurate way to calculate a T-matrix [ref].</p>
+<p>SMARTIES is a Matlab implementation of the EBCM to simulate the optical properties of oblate and prolate spheroidal particles, with comparable speed, convenience and accuracy as Mie theory for spheres. SMARTIES is only applicable to spheroidal particles, for which it uses an improved algorithm that overcomes some of the numerical difficulties related to loss of precision faced by EBCM in the case of large and elongated particles [ref]. The code may be useful to researchers seeking a fast, accurate and reliable tool to simulate the near-field and far-field optical properties of elongated particles, but can also appeal to other developers of light-scattering software seeking a reliable benchmark for non-spherical particles with a challenging aspect ratio and/or refractive index contrast.</p>
+<p>We provide below an example script to output the T-matrix of a gold spheroid, used in the calculation of Figure XX.</p>
+<pre><code>wavelength = 600:50:800; wavelength = wavelength(:); 
+Nl = length(wavelength);
+epsilon=epsAu(wavelength);
+medium=1.33;
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>baptiste </p>
-          </div>
-  </div>
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">June 26, 2024</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
+% constant simulation parameters
+stParams.a=20;
+stParams.c=40;
+stParams.N=3; 
+stParams.nNbTheta=90;
+% internal options
+stOptions.bGetR = false;
 
+%% calculation for all wavelengths
 
-</header>
+% allocate 3D array for all results
+qmax = 2*(stParams.N*(stParams.N + 1) + stParams.N); % size of full T-matrix
+tmatrix = zeros(qmax, qmax, Nl);
 
+% indices in TERMS order (2x2 blocks)
+vecq = 1:qmax;
+vecs = [repmat(1,1, qmax/2), repmat(2,1, qmax/2)];
+vecp = vecq - (vecs - 1) * qmax/2;
+vecl = floor(sqrt(vecp));
+vecm = vecp - vecl.*(vecl + 1);
 
-<p>The convention is to use</p>
+% loop over wavelengths
+for i=1:Nl
+    stParams.k1=medium*2*pi/wavelength(i);
+    stParams.s=sqrt(epsilon(i)) / medium;
+
+    [stCoa, stT] = slvForT(stParams,stOptions);
+
+    [T, q, qp] = exportTmatrix( stT, true, [], [] );
+    % q, qp are the row,col indices in TERMS convention
+    % converted to u, up for treams conventions
+    [u] = treams_indexing(q, qmax);
+    [up] = treams_indexing(qp, qmax);
+    ind = sub2ind(size(tmatrix),u,up,u*0+i); 
+    % which linear index for elements (u,u',lambdai)
+    tmatrix(ind) =  T(:,7) + 1i*T(:,8);
+
+end
+
+% analytical zeros are those entries SMARTIES did not need to compute
+nonzeros = sub2ind([qmax,qmax],q,qp);
+zeros = setdiff((1:qmax^2)', nonzeros);
+[zerosq, zerosqp] = ind2sub([qmax,qmax], zeros);
+zeros  = struct('q', int64(zerosq), 'qp', int64(zerosqp));
+
+%% data to export
+polars = ["electric","magnetic"];
+modes = struct('l', int64(vecl),'m', int64(vecm), 'polarization', polars(vecs));
+
+epsilon = struct('embedding', medium^2, 'spheroid', epsilon);
+geometry = struct('spheroid', struct('radiusxy', stParams.a, 'radiusz', stParams.c));
+method_parameters = struct('Lmax', int64(stParams.N), ...
+                           'Ntheta', int64(stParams.nNbTheta));
+computation = struct('method_parameters', method_parameters, ...
+                     'analytical_zeros', zeros);
+
+comments = struct('name', 'Au prolate spheroid in water',...
+    'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids',...
+    'material_reference', 'Au from Raschke et al 10.1103/PhysRevB.86.235147', ...
+    'material_spheroid', 'gold', ...,
+    'material_embedding', 'water', ...,
+    'keywords', 'gold, spheroid, ebcm', ...
+    'script', [mfilename '.m']);
+
+[f, uuid] = tmatrix_hdf5('smarties_spectrum.tmat.h5', tmatrix, modes, wavelength, epsilon, geometry, computation, comments)</code></pre>
+<p>== TERMS</p>
+<p>TERMS is a Fortran program based on the superposition T-matrix method, designed to simulate the near-field and far-field optical properties of collections of particles [ref]. It was developed primarily to model relatively compact clusters of resonant scatterers, such as plasmonic particles often requiring large multipolar orders [ref]. TERMS implements several independent algorithms, with complementary strengths and weaknesses, to describe the self-consistent electromagnetic interaction between multiple scatterers, and from there compute far-field optical properties such as absorption, scattering, extinction, circular dichroism, as well as near-field intensities and the local degree of optical chirality. By describing the incident and scattered fields in a basis of spherical waves the T-matrix framework lends itself to analytical formulas for orientation-averaged quantities such as far-field cross-sections and near-field quantities, greatly reducing the computational time needed to simulate particles and systems of particles in random orientation [ref].</p>
+<p>Each scatterer is described by a T-matrix, which is computed internally for spherical particles (including layered spheres), or using external files computed with any other method.</p>
+<p>TERMS computations are divided into three main modes:</p>
 <ul>
-<li>m: multipole order, -l:l</li>
-<li>l: multipole degree 1:lmax</li>
-<li>s: multipole polarisation type, 1 or 2</li>
+<li>Far-field quantities (absorption, scattering, extinction, circular dichroism) for multiple wavelengths and angles of incidence, as well as orientation-averages</li>
+<li>Near-field calculations for multiple wavelengths and incident angles, also computing the local degree of chirality, as well as orientation-averages</li>
+<li>Stokes parameters and differential scattering cross-sections for multiple incidence or scattering angles</li>
 </ul>
-<p>so for a T-matrix with <span class="math inline">\(lmax=3\)</span>, we have</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>l: 1..3
-m: -3..3
-s: 1..2
-900 elements</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="indexing_files/figure-html/tmat-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>for each block we introduce a combined p-index such that,</p>
-<p><span class="math display">\[
-p(n,m) = n(n+1)+m
-\]</span> which here varies as p: 1..15, as each block is of dimension <code>pmax = lmax(lmax+1)+lmax = 3(3+1)+3 = 15</code>.</p>
-<p>The whole T-matrix is indexed with a combined q-index such that,</p>
-<p><span class="math display">\[
-q(s,p) = (s-1)p_{max} + p
-\]</span> which here gives us, q: 1..30. The total T-matrix dimension (along rows/columns) is thus <span class="math inline">\(q_{max}=2\times(lmax(lmax+1)+lmax)=30\)</span>.</p>
-<p>In summary, for a given <span class="math inline">\(l_\text{max}\)</span> the indices are given by:</p>
-<ul>
-<li><span class="math inline">\(l=1:l_\text{max}\)</span></li>
-<li><span class="math inline">\(m=-l:l\)</span> for each l</li>
-<li><span class="math inline">\(s=1:2\)</span> for each pair of (l,m)</li>
-<li><span class="math inline">\(p(l,m) = l(l+1)+m\)</span></li>
-<li><span class="math inline">\(q(s,p) = (s-1)p_{max} + p\)</span></li>
-</ul>
-<p>Given <span class="math inline">\(q\)</span> and <span class="math inline">\(l_\text{max}\)</span> we can invert these indices as follows,</p>
-<ul>
-<li><span class="math inline">\(p = q - (s-1)q_\text{max}/2\)</span>,<br>
-giving here, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15</li>
-<li><span class="math inline">\(l = \lfloor\sqrt{p}\rfloor\)</span>,<br>
-giving here 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3</li>
-<li><span class="math inline">\(m = p - l(l+1)\)</span>,<br>
-giving here -1, 0, 1, -2, -1, 0, 1, 2, -3, -2, -1, 0, 1, 2, 3, -1, 0, 1, -2, -1, 0, 1, 2, -3, -2, -1, 0, 1, 2, 3</li>
-</ul>
-<div class="cell">
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">1</th>
-<th style="text-align: right;">2</th>
-<th style="text-align: right;">3</th>
-<th style="text-align: right;">4</th>
-<th style="text-align: right;">5</th>
-<th style="text-align: right;">6</th>
-<th style="text-align: right;">7</th>
-<th style="text-align: right;">8</th>
-<th style="text-align: right;">9</th>
-<th style="text-align: right;">10</th>
-<th style="text-align: right;">11</th>
-<th style="text-align: right;">12</th>
-<th style="text-align: right;">13</th>
-<th style="text-align: right;">14</th>
-<th style="text-align: right;">15</th>
-<th style="text-align: right;">16</th>
-<th style="text-align: right;">17</th>
-<th style="text-align: right;">18</th>
-<th style="text-align: right;">19</th>
-<th style="text-align: right;">20</th>
-<th style="text-align: right;">21</th>
-<th style="text-align: right;">22</th>
-<th style="text-align: right;">23</th>
-<th style="text-align: right;">24</th>
-<th style="text-align: right;">25</th>
-<th style="text-align: right;">26</th>
-<th style="text-align: right;">27</th>
-<th style="text-align: right;">28</th>
-<th style="text-align: right;">29</th>
-<th style="text-align: right;">30</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">p</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">15</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">l</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">m</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">-3</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">-3</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">s</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p>The program’s documentation and website offer many examples of use [ref]; for the purpose of this work we only illustrate the import of an external T-matrix in the <code>tmat.h5</code> format. The input file for the simulation reproduced below considers two gold spheroids in water, separated by 100 nm and rotated by 45 degrees to form a chiral structure.</p>
+<pre><code>ModeAndScheme 2 3
+MultipoleCutoff 5
+Wavelength 400 800 200
+Medium 1.7689 # water
+
+# dimer of Au spheroids
+Scatterers 2
+TF1 0 -50 0.0 50 0.0 0.0 0.0  2.5
+TF1 0  50 0.0 50 0.0 0.7853982 0  2.5</code></pre>
+<p>The simulation is run with the command</p>
+<pre><code>terms input &gt; log</code></pre>
+<p>and outputs cross-sections in the file <code>results.h5</code>, displayed in Figure XX. For comparison, the same simulation was run with a T-matrix produced by SMARTIES (Script XX) for the same geometry.</p>
+<p>= Tools for conversion</p>
+<p>A number of open-source programs are available to compute T-matrices, but many of them do not (yet) implement the output format presented herein. While we encourage the community to add this functionality in order to fully benefit from interoperability between programs, it can also be useful, as a short-term or one-time workaround, to <em>convert</em> T-matrix data stored in a different form. One example is the “long format” used to store T-matrix entries in earlier versions of SMARTIES [ref], or Scuff-EM [ref], or PXTAL [ref]. We include example scripts at [url] to reshape such data and produce a standard h5 format.</p>
+<pre><code>d = read.table('data/tmat_Au20x40_Nmax3.tmat')
+names(d) = c('s','sp','l','lp','m','mp','Tr','Ti')
+head(d)
+  s sp l lp  m mp            Tr            Ti
+1 1  1 1  1 -1 -1 -6.049214e-05 -4.266526e-04
+2 1  1 1  1  0  0 -3.331557e-05 -3.932179e-04
+3 1  1 1  1  1  1 -6.049214e-05 -4.266526e-04
+4 1  1 1  3 -1 -1 -2.374705e-07 -1.995117e-06
+5 1  1 1  3  0  0 -1.110299e-07 -1.278537e-06
+6 1  1 1  3  1  1 -2.374705e-07 -1.995117e-06</code></pre>
+<p>Conversion to wide format, and export as <code>.tmat.h5</code>, can then be done by adding the required geometry and material information to make a complete entry. Basic export scripts are available in 4 different languages (R, Julia, Matlab, Python) to serve as examples for similar conversion tasks.</p>
 
 
 

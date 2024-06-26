@@ -1,3 +1,4 @@
+## ----eval=FALSE---------------------------------------------------------------
 library(rhdf5) # note: dev version to support complex
 library(uuid) # uuid
 library(glue) # string interpolation
@@ -16,11 +17,12 @@ qmax <- 2*(Lmax*(Lmax+1)+Lmax) # T-matrix size
 # note the byrow due to HDF5 expecting
 # row-major ordering vs R's default column-major
 tdata <- matrix(1:qmax^2 + 1i*(1:qmax^2), qmax, qmax, byrow=TRUE)
-tdata[1:3,1:3]
 
 tmatrix <- array(NA_complex_, c(Nl,qmax,qmax))
 for(i in seq_len(Nl))
   tmatrix[i,,] <- tdata
+
+tmatrix[1,1:3,1:3]
 
 modes <- list(l = rep(NA_integer_, qmax),
               m = rep(NA_integer_, qmax),
@@ -38,21 +40,31 @@ for (li in 1:Lmax){
   }
 }
 
-# dummy 'analytical zeros' for e.g. EBCM methods
-# not used in this example
-# zeros <- expand.grid(q=seq(1,30,by=2), qp = seq(1,30,by=2))
-
-embedding <- list('relative_permeability' = 1.0, 'relative_permittivity' = 1.33^2)
+embedding <- list('relative_permeability' = 1.0, 
+                  'relative_permittivity' = 1.33^2)
 scatterer <- list(material = list('relative_permeability' = 1.0, 
-                                  'relative_permittivity' = rep(-11.4+1.181i,Nl)),
-                  geometry = list('radiusxy' = 20.0, 'radiusz' = 40.0))
+                                  'relative_permittivity' =
+                                    rep(-11.4+1.181i,Nl)),
+                  geometry = list('radiusxy' = 20.0, 
+                                  'radiusz' = 40.0))
 
-computation <- list(method_parameters = list('Lmax' = Lmax, 'Ntheta' = 100),
-                    files = list(script = glue::glue_collapse(readLines('test_dummy.R'))))
+computation <- list(method_parameters = list('Lmax' = Lmax, 
+                                             'Ntheta' = 100),
+                    files = list(script = paste(readLines('export_R.R'), 
+                                                collapse = "\n")))
 
-# uuid <- uuid::UUIDgenerate()
 
-## create file
+
+## ----eval=FALSE---------------------------------------------------------------
+library(rhdf5) # note: requires dev version to support complex arrays
+# cf https://support.bioconductor.org/p/9156305/#9156408
+# install.packages("remotes")
+# remotes::install_github("grimbough/rhdf5@devel")
+# may need 'crypto' library from openSSL to compile
+# e.g. via brew install openssl on macos
+
+
+## ----eval=FALSE---------------------------------------------------------------
 f <- 'ar.tmat.h5'
 
 unlink(f) # delete previous file if it exists
@@ -111,8 +123,4 @@ h5writeAttribute("1.1", gid, "version")
 H5Gclose(gid)
 
 H5Fclose(fid)
-
-
-
-
 

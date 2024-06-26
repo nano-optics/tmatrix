@@ -15,6 +15,8 @@ for i=1:Nl
     tmatrix[i,:,:] = tdata
 end
 
+print(tmatrix[1,1:3,1:3])
+
 l = zeros(Int64, qmax)
 m = zeros(Int64, qmax)
 s = Vector{String}(undef,qmax)
@@ -32,17 +34,6 @@ for li = 1:Lmax
 end
 end
 
-# dummy 'analytical zeros' for e.g. EBCM methods
-# not used in this example
-# azeros = collect(Iterators.product(1:2:30, 1:2:30))
-# analytical_zeros = (q=[z[1] for z in azeros[:]],
-#     qp=[z[2] for z in azeros[:]])
-
-# pkgs = Pkg.Operations.Context().env.manifest
-# hdf5version = string(pkgs[findfirst(v -> v.name == "HDF5", pkgs)].version)
-
-
-## saving
 
 f = "aj.tmat.h5"
 h5open(f, "w") do fid
@@ -83,7 +74,7 @@ h5open(f, "w") do fid
     mpar["Lmax"] = Lmax
     mpar["Ntheta"] = 100
     script = create_group(fid, "computation/files") 
-    script["script"] = read("test_dummy.jl", String)
+    script["script"] = read("export_julia.jl", String)
     
     # write root attributes
     attributes(fid["computation"])["method"] = "EBCM, Extended Boundary Condition Method"
@@ -98,5 +89,4 @@ h5open(f, "w") do fid
     attributes(fid)["storage_format_version"] = "v0.01"
     
 end
-
 

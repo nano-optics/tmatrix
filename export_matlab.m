@@ -1,7 +1,3 @@
-addpath(genpath('../easyh5/'));
-clearvars;
-
-
 % possibly multiple wavelengths
 wavelength  = (400:50:800)';
 Nl = length(wavelength);
@@ -13,14 +9,15 @@ qmax = 2*(Lmax*(Lmax+1)+Lmax); % T-matrix size
 % note the transpose due to HDF5 expecting
 % row-major ordering vs matlab's default column-major
 tdata = transpose(reshape((1:qmax^2) + 1i*(1:qmax^2), [qmax,qmax]));
-tdata(1:3,1:3)
 
 tmatrix = zeros(Nl,qmax,qmax);
 for i=1:Nl
     tmatrix(i,:,:) = tdata;
 end
 
-% modes, but note that polarization is handled separately
+squeeze(tmatrix(1,1:3,1:3))
+
+% modes, but note that polarization is turned into strings separately
 i=1;
 for l=1:3
     for m=-l:l
@@ -60,7 +57,7 @@ method_parameters = struct('Lmax', int64(3), ...
 computation = struct('method_parameters', method_parameters);
 % 'analytical_zeros', zeros can be added here
 
-script = convertCharsToStrings(fileread('test_dummy.m'));
+script = convertCharsToStrings(fileread('export_matlab.m'));
 
 % combined (almost all) information into one struct
 s = struct('tmatrix', tmatrix, ...
@@ -70,19 +67,17 @@ s = struct('tmatrix', tmatrix, ...
     'modes', modes, ...
     'computation', computation);
 
+addpath(genpath('../easyh5/'));
 
-%% save to file
 f = 'am.tmat.h5';
 saveh5(s, f, 'ComplexFormat', {'r','i'}, 'rootname', '', 'Compression', 'deflate'); 
 
 % deal with string objects manually
-
 h5create(f,'/computation/files/script', size(script), 'Datatype', 'string')
 h5write(f,'/computation/files/script', script)
 
 h5create(f,'/modes/polarization', size(polarization), 'Datatype', 'string')
 h5write(f,'/modes/polarization', polarization)
-
 
 % root attributes
 h5writeatt(f, '/', 'name', 'Au prolate spheroid in water');
@@ -91,11 +86,8 @@ h5writeatt(f, '/','description', ...
     'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids');
 h5writeatt(f, '/','keywords', 'gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz');
 
-h5writeatt(f, '/computation', 'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids');
-h5writeatt(f, '/computation', 'name', 'SMARTIES');
-h5writeatt(f, '/computation', 'method', 'EBCM, Extended Boundary Condition Method');
-h5writeatt(f, '/computation', 'software', 'SMARTIES');
-h5writeatt(f, '/computation', 'version', '1.1');
+% object and group attributes
+h5writeatt(f, '/vacuum_wavelength', 'unit', 'nm');
 
 h5writeatt(f, '/embedding', 'keywords', 'non-dispersive');
 h5writeatt(f, '/embedding', 'name', 'H2O, Water');
@@ -108,5 +100,9 @@ h5writeatt(f, '/scatterer/geometry', 'name', 'homogeneous spheroid with symmetry
 h5writeatt(f, '/scatterer/geometry', 'unit', 'nm');
 h5writeatt(f, '/scatterer/geometry', 'shape', 'spheroid')
 
-h5writeatt(f, '/vacuum_wavelength', 'unit', 'nm');
+h5writeatt(f, '/computation', 'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids');
+h5writeatt(f, '/computation', 'name', 'SMARTIES');
+h5writeatt(f, '/computation', 'method', 'EBCM, Extended Boundary Condition Method');
+h5writeatt(f, '/computation', 'software', 'SMARTIES');
+h5writeatt(f, '/computation', 'version', '1.1');
 

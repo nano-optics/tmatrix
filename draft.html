@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="baptiste">
-<meta name="dcterms.date" content="2024-06-26">
 
-<title>T-matrix – Indexing conventions</title>
+<title>T-matrix – draft</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -134,7 +132,7 @@ window.Quarto = {
 <span class="menu-text">Conversion long/wide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./indexing.html" aria-current="page"> 
+    <a class="nav-link" href="./indexing.html"> 
 <span class="menu-text">Indexing reference</span></a>
   </li>  
   <li class="nav-item">
@@ -188,292 +186,44 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Indexing conventions</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>baptiste </p>
-          </div>
-  </div>
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">June 26, 2024</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p>The convention is to use</p>
+<p>== TERMS</p>
+<p>TERMS stands for Electromagnetic Radiation with Multiple Scatterers — it is a Fortran program to simulate the near-field and far-field optical properties of collections of particles. &nbsp;solves rigorously the Maxwell equations via the superposition &nbsp;method, where incident and scattered fields are decomposed into a basis of multipolar electric and magnetic spherical waves.</p>
+<p>In a multiple-scattering problem the net field exciting a given particle is composed of the incident field plus the scattering contribution from neighbouring particles, restulting in a coupled system of equations to be solved for the total fields. &nbsp;implements several algorithms to describe the self-consistent electromagnetic interaction between multiple scatterers, and from there compute optical properties such as absorption, scattering, extinction, circular dichroism, as well as near-field intensities and the local degree of optical chirality.</p>
+<p>By describing the incident and scattered fields in a basis of spherical waves the &nbsp;framework lends itself to analytical formulas for orientation-averaged quantities such as far-field cross-sections and near-field intensities, greatly reducing the computational time needed to simulate particles and systems of particles in random orientation.</p>
+<p>The possible computations are divided into three main modes:</p>
 <ul>
-<li>m: multipole order, -l:l</li>
-<li>l: multipole degree 1:lmax</li>
-<li>s: multipole polarisation type, 1 or 2</li>
+<li>Far-field quantities (absorption, scattering, extinction, circular dichroism) for multiple wavelengths and angles of incidence, as well as orientation-averages</li>
+<li>Near-field calculations for multiple wavelengths and incident angles, also computing the local degree of chirality, as well as orientation-averages</li>
+<li>Stokes parameters and differential scattering cross-sections for multiple incidence or scattering angles</li>
 </ul>
-<p>so for a T-matrix with <span class="math inline">\(lmax=3\)</span>, we have</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>l: 1..3
-m: -3..3
-s: 1..2
-900 elements</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="indexing_files/figure-html/tmat-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>for each block we introduce a combined p-index such that,</p>
-<p><span class="math display">\[
-p(n,m) = n(n+1)+m
-\]</span> which here varies as p: 1..15, as each block is of dimension <code>pmax = lmax(lmax+1)+lmax = 3(3+1)+3 = 15</code>.</p>
-<p>The whole T-matrix is indexed with a combined q-index such that,</p>
-<p><span class="math display">\[
-q(s,p) = (s-1)p_{max} + p
-\]</span> which here gives us, q: 1..30. The total T-matrix dimension (along rows/columns) is thus <span class="math inline">\(q_{max}=2\times(lmax(lmax+1)+lmax)=30\)</span>.</p>
-<p>In summary, for a given <span class="math inline">\(l_\text{max}\)</span> the indices are given by:</p>
+<p>The computational cost scales with the size of the linear system, proportional to the number of particles <span class="math inline">\(N_(upright("p"))\)</span>, and to the square of the maximum multipolar order <span class="math inline">\(N_(upright("max"))\)</span>. On a typical PC we may treat up to <span class="math inline">\(tilde.op upright("500")\)</span> particles with <span class="math inline">\(N_(upright("max")) = upright("1")\)</span>, and a dimer with <span class="math inline">\(N_(upright("max"))\)</span> up to <span class="math inline">\(tilde.op upright("60")\)</span>.</p>
+<p>Notable features of TERMS include:</p>
 <ul>
-<li><span class="math inline">\(l=1:l_\text{max}\)</span></li>
-<li><span class="math inline">\(m=-l:l\)</span> for each l</li>
-<li><span class="math inline">\(s=1:2\)</span> for each pair of (l,m)</li>
-<li><span class="math inline">\(p(l,m) = l(l+1)+m\)</span></li>
-<li><span class="math inline">\(q(s,p) = (s-1)p_{max} + p\)</span></li>
+<li>Incident plane waves along arbitrary directions, with linear or circular polarisation</li>
+<li>Built-in calculation of individual #emph[T];-matrices for coated spheres; import of general #emph[T];-matrices from other programs (e.g.~#link(“https://www.victoria.ac.nz/scps/research/research-groups/raman-lab/numerical-tools/smarties”)[SMARTIES];)</li>
+<li>Built-in dielectric functions for common materials such as Au, Ag, Al, Cr, Pt, Pd, Si, and Water, or from tabulated values</li>
+<li>Per-layer absorption in layered spheres</li>
+<li>Orientation-averaging of far-field cross-sections, as well as linear and circular dichroism</li>
+<li>Near-field maps of electric and magnetic field components, <span class="math inline">\(lr(|upright(bold(E))|)^2\)</span>, <span class="math inline">\(lr(|upright(bold(E))|)^4\)</span>, <span class="math inline">\(cal(C) prop Im (upright(bold(E))^(\*) dot.op upright(bold(B)))\)</span></li>
+<li>Calculation of the global cluster #emph[T];-matrix</li>
+<li>“Masking” of specific multipolar orders</li>
+<li>Calculation of Stokes parameters, phase matrix, differential scattering</li>
+<li>Plain text or HDF5 I/O format</li>
+<li>Possible compilation in quad-precision</li>
 </ul>
-<p>Given <span class="math inline">\(q\)</span> and <span class="math inline">\(l_\text{max}\)</span> we can invert these indices as follows,</p>
-<ul>
-<li><span class="math inline">\(p = q - (s-1)q_\text{max}/2\)</span>,<br>
-giving here, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15</li>
-<li><span class="math inline">\(l = \lfloor\sqrt{p}\rfloor\)</span>,<br>
-giving here 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3</li>
-<li><span class="math inline">\(m = p - l(l+1)\)</span>,<br>
-giving here -1, 0, 1, -2, -1, 0, 1, 2, -3, -2, -1, 0, 1, 2, 3, -1, 0, 1, -2, -1, 0, 1, 2, -3, -2, -1, 0, 1, 2, 3</li>
-</ul>
-<div class="cell">
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">1</th>
-<th style="text-align: right;">2</th>
-<th style="text-align: right;">3</th>
-<th style="text-align: right;">4</th>
-<th style="text-align: right;">5</th>
-<th style="text-align: right;">6</th>
-<th style="text-align: right;">7</th>
-<th style="text-align: right;">8</th>
-<th style="text-align: right;">9</th>
-<th style="text-align: right;">10</th>
-<th style="text-align: right;">11</th>
-<th style="text-align: right;">12</th>
-<th style="text-align: right;">13</th>
-<th style="text-align: right;">14</th>
-<th style="text-align: right;">15</th>
-<th style="text-align: right;">16</th>
-<th style="text-align: right;">17</th>
-<th style="text-align: right;">18</th>
-<th style="text-align: right;">19</th>
-<th style="text-align: right;">20</th>
-<th style="text-align: right;">21</th>
-<th style="text-align: right;">22</th>
-<th style="text-align: right;">23</th>
-<th style="text-align: right;">24</th>
-<th style="text-align: right;">25</th>
-<th style="text-align: right;">26</th>
-<th style="text-align: right;">27</th>
-<th style="text-align: right;">28</th>
-<th style="text-align: right;">29</th>
-<th style="text-align: right;">30</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">p</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">15</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">l</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">m</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">-3</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">-3</td>
-<td style="text-align: right;">-2</td>
-<td style="text-align: right;">-1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">s</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<pre><code>ModeAndScheme 2 3
+MultipoleCutoff 15
+Wavelength 300 1000 300
+Medium 1.7689 # water
+Incidence 0.0 0.0 0.0 1
+# trimer of core-shell spheres
+Scatterers 3
+Au@Pd 0.0 0.0 0.0 30.0 29.0
+Au@Pd 52.481 30.3 0.0 30.0 29.0
+Au@Pd 52.481 -30.3 0.0 30.0 29.0</code></pre>
 
 
 
@@ -570,7 +320,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/nano-optics\.github\.io\/tmatrix\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
