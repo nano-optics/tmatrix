@@ -404,7 +404,7 @@ window.Quarto = {
 <span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"computation"</span>)</span>
 <span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"EBCM, Extended Boundary Condition Method"</span>, gid, <span class="st">"method"</span>)</span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, gid, <span class="st">"description"</span>)</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"software"</span>)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(software, gid, <span class="st">"software"</span>)</span>
 <span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"name"</span>)</span>
 <span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
@@ -449,7 +449,7 @@ window.Quarto = {
   │ ├─description: "Computation using SMARTIES, a nu..."
   │ ├─method: "EBCM, Extended Boundary Conditio..."
   │ ├─name: "SMARTIES"
-  │ └─software: "SMARTIES"
+  │ └─software: "SMARTIES=1.1, R=43.1, rhdf5=2.47.3"
   ├─embedding: &lt;list&gt;
   │ ├─keywords: "non-dispersive"
   │ └─name: "H2O, Water"

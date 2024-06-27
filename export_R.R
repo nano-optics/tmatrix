@@ -117,7 +117,7 @@ H5Gclose(gid)
 gid <- H5Gopen(fid, "computation")
 h5writeAttribute("EBCM, Extended Boundary Condition Method", gid, "method")
 h5writeAttribute("Computation using SMARTIES, a numerically robust EBCM implementation for spheroids", gid, "description")
-h5writeAttribute("SMARTIES", gid, "software")
+h5writeAttribute(software, gid, "software")
 h5writeAttribute("SMARTIES", gid, "name")
 H5Gclose(gid)
 
