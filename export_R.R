@@ -65,6 +65,7 @@ library(rhdf5) # note: requires dev version to support complex arrays
 
 ## ----eval=FALSE---------------------------------------------------------------
 f <- 'ar.tmat.h5'
+software = sprintf("SMARTIES=1.1, R=%s, rhdf5=%s", paste0(R.version$major, R.version$minor), packageVersion("rhdf5"))
 
 unlink(f) # delete previous file if it exists
 h5createFile(f)
@@ -118,7 +119,6 @@ h5writeAttribute("EBCM, Extended Boundary Condition Method", gid, "method")
 h5writeAttribute("Computation using SMARTIES, a numerically robust EBCM implementation for spheroids", gid, "description")
 h5writeAttribute("SMARTIES", gid, "software")
 h5writeAttribute("SMARTIES", gid, "name")
-h5writeAttribute("1.1", gid, "version")
 H5Gclose(gid)
 
 H5Fclose(fid)

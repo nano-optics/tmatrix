@@ -284,7 +284,7 @@ window.Quarto = {
 <p>For convenience, we can store compound objects as named tuples, which will then be mapped into HDF5 groups during export.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">## mockup data</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span>, <span class="bu">UUIDs</span>, <span class="bu">HDF5</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span>, <span class="bu">HDF5</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># possibly multiple wavelengths</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>wavelength <span class="op">=</span> <span class="fu">collect</span>(<span class="fl">400</span><span class="op">:</span><span class="fl">50</span><span class="op">:</span><span class="fl">800</span>)</span>
@@ -325,59 +325,63 @@ window.Quarto = {
 <p>Complex arrays are stored with <code>r</code> and <code>i</code> fields as usual. Note that Julia has column-major ordering, unlike HDF5, and we should therefore explicitly transpose the matrix before saving it, to avoid confusion if the data are to be read in another language. Another potential source of error is that the HDF5.jl library orders the array data differently, compared to h5py.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="st">"aj.tmat.h5"</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">h5open</span>(f, <span class="st">"w"</span>) <span class="cf">do</span> fid</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    fid[<span class="st">"vacuum_wavelength"</span>] <span class="op">=</span> wavelength</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"vacuum_wavelength"</span>])[<span class="st">"unit"</span>] <span class="op">=</span> <span class="st">"nm"</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># set = permutedims(dset, reverse(1:ndims(dset)))</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># https://juliaio.github.io/HDF5.jl/stable/#Language-interoperability-with-row-and-column-major-order-arrays</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    fid[<span class="st">"tmatrix"</span>] <span class="op">=</span> <span class="fu">permutedims</span>(tmatrix, <span class="fu">reverse</span>(<span class="fl">1</span><span class="op">:</span><span class="fu">ndims</span>(tmatrix)))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ver <span class="op">=</span> <span class="bu">Pkg</span>.Operations.<span class="fu">Context</span>().env.manifest</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>h5ver <span class="op">=</span> <span class="fu">string</span>(ver[<span class="fu">findfirst</span>(v<span class="op">-&gt;</span>v.name <span class="op">==</span> <span class="st">"HDF5"</span>, ver)].version)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>software <span class="op">=</span> <span class="st">"SMARTIES=1.1, julia=</span><span class="sc">$</span>(<span class="cn">VERSION</span>)<span class="st">, HDF5.jl=</span><span class="sc">$</span>(h5ver)<span class="st">"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">h5open</span>(f, <span class="st">"w"</span>) <span class="cf">do</span> fid</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    fid[<span class="st">"vacuum_wavelength"</span>] <span class="op">=</span> wavelength</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"vacuum_wavelength"</span>])[<span class="st">"unit"</span>] <span class="op">=</span> <span class="st">"nm"</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    modes <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"modes"</span>) </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"l"</span>] <span class="op">=</span> l</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"m"</span>] <span class="op">=</span> m</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"polarization"</span>] <span class="op">=</span> s</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    embedding <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"embedding"</span>) </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    embedding[<span class="st">"relative_permittivity"</span>] <span class="op">=</span> <span class="fl">1.33</span><span class="op">^</span><span class="fl">2</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    embedding[<span class="st">"relative_permeability"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(embedding)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"H2O, Water"</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(embedding)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"non-dispersive"</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    sca_mat <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"scatterer/material"</span>) </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    sca_mat[<span class="st">"relative_permittivity"</span>] <span class="op">=</span> <span class="fu">repeat</span>([<span class="op">-</span><span class="fl">11.4</span> <span class="op">+</span> <span class="fl">1.181im</span>], Nl)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    sca_mat[<span class="st">"relative_permeability"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"Au, Gold"</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"dispersive, plasmonic"</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"reference"</span>] <span class="op">=</span> <span class="st">"Au from Raschke et al 10.1103/PhysRevB.86.235147"</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    sca_geo <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"scatterer/geometry"</span>) </span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    sca_geo[<span class="st">"radiusxy"</span>] <span class="op">=</span> <span class="fl">20.0</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    sca_geo[<span class="st">"radiusz"</span>] <span class="op">=</span> <span class="fl">40.0</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"unit"</span>] <span class="op">=</span> <span class="st">"nm"</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"shape"</span>] <span class="op">=</span> <span class="st">"spheroid"</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"homogeneous spheroid with symmetry axis z"</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    mpar <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"computation/method_parameters"</span>) </span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    mpar[<span class="st">"Lmax"</span>] <span class="op">=</span> Lmax</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    mpar[<span class="st">"Ntheta"</span>] <span class="op">=</span> <span class="fl">100</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    script <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"computation/files"</span>) </span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    script[<span class="st">"script"</span>] <span class="op">=</span> <span class="fu">read</span>(<span class="st">"export_julia.jl"</span>, <span class="dt">String</span>)</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># write root attributes</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"method"</span>] <span class="op">=</span> <span class="st">"EBCM, Extended Boundary Condition Method"</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"description"</span>] <span class="op">=</span> <span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"software"</span>] <span class="op">=</span> <span class="st">"SMARTIES"</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"SMARTIES"</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"version"</span>] <span class="op">=</span> <span class="st">"1.1"</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"Au prolate spheroid in water"</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"description"</span>] <span class="op">=</span> <span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"</span>    </span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"storage_format_version"</span>] <span class="op">=</span> <span class="st">"v0.01"</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># set = permutedims(dset, reverse(1:ndims(dset)))</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># https://juliaio.github.io/HDF5.jl/stable/#Language-interoperability-with-row-and-column-major-order-arrays</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    fid[<span class="st">"tmatrix"</span>] <span class="op">=</span> <span class="fu">permutedims</span>(tmatrix, <span class="fu">reverse</span>(<span class="fl">1</span><span class="op">:</span><span class="fu">ndims</span>(tmatrix)))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    modes <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"modes"</span>) </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"l"</span>] <span class="op">=</span> l</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"m"</span>] <span class="op">=</span> m</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    modes[<span class="st">"polarization"</span>] <span class="op">=</span> s</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    embedding <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"embedding"</span>) </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    embedding[<span class="st">"relative_permittivity"</span>] <span class="op">=</span> <span class="fl">1.33</span><span class="op">^</span><span class="fl">2</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    embedding[<span class="st">"relative_permeability"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(embedding)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"H2O, Water"</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(embedding)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"non-dispersive"</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    sca_mat <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"scatterer/material"</span>) </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    sca_mat[<span class="st">"relative_permittivity"</span>] <span class="op">=</span> <span class="fu">repeat</span>([<span class="op">-</span><span class="fl">11.4</span> <span class="op">+</span> <span class="fl">1.181im</span>], Nl)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    sca_mat[<span class="st">"relative_permeability"</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"Au, Gold"</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"dispersive, plasmonic"</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_mat)[<span class="st">"reference"</span>] <span class="op">=</span> <span class="st">"Au from Raschke et al 10.1103/PhysRevB.86.235147"</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    sca_geo <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"scatterer/geometry"</span>) </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    sca_geo[<span class="st">"radiusxy"</span>] <span class="op">=</span> <span class="fl">20.0</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    sca_geo[<span class="st">"radiusz"</span>] <span class="op">=</span> <span class="fl">40.0</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"unit"</span>] <span class="op">=</span> <span class="st">"nm"</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"shape"</span>] <span class="op">=</span> <span class="st">"spheroid"</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(sca_geo)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"homogeneous spheroid with symmetry axis z"</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    mpar <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"computation/method_parameters"</span>) </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    mpar[<span class="st">"Lmax"</span>] <span class="op">=</span> Lmax</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    mpar[<span class="st">"Ntheta"</span>] <span class="op">=</span> <span class="fl">100</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    script <span class="op">=</span> <span class="fu">create_group</span>(fid, <span class="st">"computation/files"</span>) </span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    script[<span class="st">"script"</span>] <span class="op">=</span> <span class="fu">read</span>(<span class="st">"export_julia.jl"</span>, <span class="dt">String</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># write root attributes</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"Au prolate spheroid in water"</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"description"</span>] <span class="op">=</span> <span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"keywords"</span>] <span class="op">=</span> <span class="st">"gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"</span>    </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid)[<span class="st">"storage_format_version"</span>] <span class="op">=</span> <span class="st">"v0.01"</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># comp attributes</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"method"</span>] <span class="op">=</span> <span class="st">"EBCM, Extended Boundary Condition Method"</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"description"</span>] <span class="op">=</span> <span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"name"</span>] <span class="op">=</span> <span class="st">"SMARTIES"</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(fid[<span class="st">"computation"</span>])[<span class="st">"software"</span>] <span class="op">=</span> software</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- export the code into standalone file -->
 <p><em>Summary of the file:</em></p>
@@ -385,7 +389,7 @@ window.Quarto = {
 ├─data: &lt;list&gt;
 │ ├─computation: &lt;list&gt;
 │ │ ├─files: &lt;list&gt;
-│ │ │ └─script: "## mockup data↵using Pkg, UUIDs,..."
+│ │ │ └─script: "## mockup data↵using Pkg, HDF5↵↵..."
 │ │ └─method_parameters: &lt;list&gt;
 │ │   ├─Lmax: 3
 │ │   └─Ntheta: 100
@@ -417,8 +421,7 @@ window.Quarto = {
   │ ├─description: "Computation using SMARTIES, a nu..."
   │ ├─method: "EBCM, Extended Boundary Conditio..."
   │ ├─name: "SMARTIES"
-  │ ├─software: "SMARTIES"
-  │ └─version: "1.1"
+  │ └─software: "SMARTIES=1.1, julia=1.9.3, HDF5...."
   ├─embedding: &lt;list&gt;
   │ ├─keywords: "non-dispersive"
   │ └─name: "H2O, Water"

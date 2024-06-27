@@ -70,6 +70,10 @@ s = struct('tmatrix', tmatrix, ...
 addpath(genpath('../easyh5/'));
 
 f = 'am.tmat.h5';
+[h5major,h5minor,h5rel] = H5.get_libversion(); % HDF5 version
+matlabv = version ; % Matlab version
+software = sprintf('SMARTIES=1.1, matlab=%s, HDF5=%d.%d.%d',matlabv,h5major,h5minor,h5rel);
+
 saveh5(s, f, 'ComplexFormat', {'r','i'}, 'rootname', '', 'Compression', 'deflate'); 
 
 % deal with string objects manually
@@ -103,6 +107,5 @@ h5writeatt(f, '/scatterer/geometry', 'shape', 'spheroid')
 h5writeatt(f, '/computation', 'description', 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids');
 h5writeatt(f, '/computation', 'name', 'SMARTIES');
 h5writeatt(f, '/computation', 'method', 'EBCM, Extended Boundary Condition Method');
-h5writeatt(f, '/computation', 'software', 'SMARTIES');
-h5writeatt(f, '/computation', 'version', '1.1');
+h5writeatt(f, '/computation', 'software', software);
 

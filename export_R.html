@@ -352,60 +352,60 @@ window.Quarto = {
 <p>Attributes don’t seem to have a convenient high-level interface, and unfortunately they need to be written slightly differently for the root level, datasets, and groups.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="st">'ar.tmat.h5'</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(f) <span class="co"># delete previous file if it exists</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">h5createFile</span>(f)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">h5closeAll</span>() <span class="co"># in case connections open</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(wavelength, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/vacuum_wavelength"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(tmatrix, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/tmatrix"</span>, <span class="at">native=</span><span class="cn">TRUE</span>) <span class="co"># store rowwise</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(modes, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/modes'</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(embedding, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/embedding"</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(scatterer, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/scatterer"</span>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(computation, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/computation'</span>)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## write attributes</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>fid <span class="ot">&lt;-</span> <span class="fu">H5Fopen</span>(f)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># root level</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au prolate spheroid in water"</span>, fid, <span class="st">"name"</span>)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, fid, <span class="st">"description"</span>)</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"</span>, fid, <span class="st">"keywords"</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"v0.01"</span>, fid, <span class="st">"storage_format_version"</span>)</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># wavelength</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>did <span class="ot">&lt;-</span> <span class="fu">H5Dopen</span>(fid, <span class="st">"vacuum_wavelength"</span>)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, did, <span class="st">"unit"</span>)</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Dclose</span>(did)</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># embedding</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"embedding"</span>)</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"H2O, Water"</span>, gid, <span class="st">"name"</span>)</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"non-dispersive"</span>, gid, <span class="st">"keywords"</span>)</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># material</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/material"</span>)</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au, Gold"</span>, gid, <span class="st">"name"</span>)</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"dispersive, plasmonic"</span>, gid, <span class="st">"keywords"</span>)</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au from Raschke et al 10.1103/PhysRevB.86.235147"</span>, gid, <span class="st">"reference"</span>)</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co"># geometry</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/geometry"</span>)</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, gid, <span class="st">"unit"</span>)</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"spheroid"</span>, gid, <span class="st">"shape"</span>)</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"homogeneous spheroid with symmetry axis z"</span>, gid, <span class="st">"name"</span>)</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="co"># computation</span></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"computation"</span>)</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"EBCM, Extended Boundary Condition Method"</span>, gid, <span class="st">"method"</span>)</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, gid, <span class="st">"description"</span>)</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"software"</span>)</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"name"</span>)</span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"1.1"</span>, gid, <span class="st">"version"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>software <span class="ot">=</span> <span class="fu">sprintf</span>(<span class="st">"SMARTIES=1.1, R=%s, rhdf5=%s"</span>, <span class="fu">paste0</span>(R.version<span class="sc">$</span>major, R.version<span class="sc">$</span>minor), <span class="fu">packageVersion</span>(<span class="st">"rhdf5"</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(f) <span class="co"># delete previous file if it exists</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">h5createFile</span>(f)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">h5closeAll</span>() <span class="co"># in case connections open</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(wavelength, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/vacuum_wavelength"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(tmatrix, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/tmatrix"</span>, <span class="at">native=</span><span class="cn">TRUE</span>) <span class="co"># store rowwise</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(modes, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/modes'</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(embedding, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/embedding"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(scatterer, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">"/scatterer"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">h5write</span>(computation, <span class="at">file=</span>f, <span class="at">name=</span><span class="st">'/computation'</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="do">## write attributes</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>fid <span class="ot">&lt;-</span> <span class="fu">H5Fopen</span>(f)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># root level</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au prolate spheroid in water"</span>, fid, <span class="st">"name"</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, fid, <span class="st">"description"</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"</span>, fid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"v0.01"</span>, fid, <span class="st">"storage_format_version"</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># wavelength</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>did <span class="ot">&lt;-</span> <span class="fu">H5Dopen</span>(fid, <span class="st">"vacuum_wavelength"</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, did, <span class="st">"unit"</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Dclose</span>(did)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># embedding</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"embedding"</span>)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"H2O, Water"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"non-dispersive"</span>, gid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co"># material</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/material"</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au, Gold"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"dispersive, plasmonic"</span>, gid, <span class="st">"keywords"</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Au from Raschke et al 10.1103/PhysRevB.86.235147"</span>, gid, <span class="st">"reference"</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co"># geometry</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"scatterer/geometry"</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"nm"</span>, gid, <span class="st">"unit"</span>)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"spheroid"</span>, gid, <span class="st">"shape"</span>)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"homogeneous spheroid with symmetry axis z"</span>, gid, <span class="st">"name"</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co"># computation</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>gid <span class="ot">&lt;-</span> <span class="fu">H5Gopen</span>(fid, <span class="st">"computation"</span>)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"EBCM, Extended Boundary Condition Method"</span>, gid, <span class="st">"method"</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"</span>, gid, <span class="st">"description"</span>)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"software"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">h5writeAttribute</span>(<span class="st">"SMARTIES"</span>, gid, <span class="st">"name"</span>)</span>
 <span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Gclose</span>(gid)</span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">H5Fclose</span>(fid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -449,8 +449,7 @@ window.Quarto = {
   │ ├─description: "Computation using SMARTIES, a nu..."
   │ ├─method: "EBCM, Extended Boundary Conditio..."
   │ ├─name: "SMARTIES"
-  │ ├─software: "SMARTIES"
-  │ └─version: "1.1"
+  │ └─software: "SMARTIES"
   ├─embedding: &lt;list&gt;
   │ ├─keywords: "non-dispersive"
   │ └─name: "H2O, Water"

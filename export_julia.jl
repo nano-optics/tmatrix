@@ -1,5 +1,5 @@
 ## mockup data
-using Pkg, UUIDs, HDF5
+using Pkg, HDF5
 
 # possibly multiple wavelengths
 wavelength = collect(400:50:800)
@@ -36,6 +36,10 @@ end
 
 
 f = "aj.tmat.h5"
+ver = Pkg.Operations.Context().env.manifest
+h5ver = string(ver[findfirst(v->v.name == "HDF5", ver)].version)
+software = "SMARTIES=1.1, julia=$(VERSION), HDF5.jl=$(h5ver)"
+
 h5open(f, "w") do fid
 
     fid["vacuum_wavelength"] = wavelength
@@ -77,16 +81,16 @@ h5open(f, "w") do fid
     script["script"] = read("export_julia.jl", String)
     
     # write root attributes
-    attributes(fid["computation"])["method"] = "EBCM, Extended Boundary Condition Method"
-    attributes(fid["computation"])["description"] = "Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"
-    attributes(fid["computation"])["software"] = "SMARTIES"
-    attributes(fid["computation"])["name"] = "SMARTIES"
-    attributes(fid["computation"])["version"] = "1.1"
-
     attributes(fid)["name"] = "Au prolate spheroid in water"
     attributes(fid)["description"] = "Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"
     attributes(fid)["keywords"] = "gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz"    
     attributes(fid)["storage_format_version"] = "v0.01"
     
+    # comp attributes
+    attributes(fid["computation"])["method"] = "EBCM, Extended Boundary Condition Method"
+    attributes(fid["computation"])["description"] = "Computation using SMARTIES, a numerically robust EBCM implementation for spheroids"
+    attributes(fid["computation"])["name"] = "SMARTIES"
+    attributes(fid["computation"])["software"] = software
+
 end
 

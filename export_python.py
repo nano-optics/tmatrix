@@ -63,7 +63,6 @@ with h5py.File(f, "w") as f:
     f["computation"].attrs["description"] = "Computation using SMARTIES, a numerically robust EBCM implementation for spheroids" 
     f["computation"].attrs["software"] = f"SMARTIES=1.1, python={sys.version.split()[0]}, h5py={h5py.__version__}"
     f["computation"].attrs["name"] = "SMARTIES"
-    f["computation"].attrs["version"] = "1.1"
     f.attrs['name'] = 'Au prolate spheroid in water'
     f.attrs['keywords'] = 'gold, spheroid, ebcm, passive, reciprocal, czinfinity, mirrorxyz'
     f.attrs['description'] = 'Computation using SMARTIES, a numerically robust EBCM implementation for spheroids'
