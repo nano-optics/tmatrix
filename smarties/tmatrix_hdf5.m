@@ -1,62 +1,104 @@
-function [f, uuid] = tmatrix_hdf5(f, tmatrix, modes, wavelength, epsilon, geometry, computation, comments)
+function [f, uuid] = tmatrix_hdf5(f, tmatrix, wavelength, epsilon, geometry, computation, comments)
 %tmatrix_hdf5 Write T-matrix into standard HDF5 format
 %   Arguments somewhat tailored for SMARTIES
 %
 %  f: filename
 %  tmatrix: array (wide format)
-%  modes: struct with fields: l, m, polarization: note must be ordered as
-%  per standard
+%  modes: struct with fields: l, m, polarization, ordered as per standard
 %  wavelength: scalar or vector [in nm]
 %  epsilon: struct with fields: embedding, [particle material]
 %  geometry: struct with fields: description, [particle material]
 %  computation: struct with fields: embedding, [particle material]
-%  comments: struct with fields: script,
+%  comments: struct with fields: script
 %
 %
 
-uuid = char(matlab.lang.internal.uuid());
+% check that sizes make sense
+[a,b,c] = size(tmatrix);
+a == length(wavelength);
+b == c;
+Lmax = computation.Lmax;
+qmax = 2*(Lmax*(Lmax+1)+Lmax); % T-matrix size
+b == qmax;
 
-% append file script
-computation.script = fileread(comments.script);
+i=1;
+for l=1:Lmax
+    for m=-l:l
+        for s=1:2
+            modes.l(i) = int64(l);
+            modes.m(i) = int64(m);
+            modes.s(i) = int64(s);
+            i=i+1;
+        end
+    end
+end
+polars = ["electric","magnetic"];
+polarization = polars(modes.s);
+modes = rmfield(modes,'s');
 
-% grab polarization as it's not handled correctly by easyh5
-polarization = modes.polarization;
-modes = rmfield(modes,'polarization');
 
-% strip description (written as attribute, not value)
-geo_description = geometry.description;
-geometry = rmfield(geometry,'description');
-
+% smarties does not do magnetic materials, and has only 2 regions
 embedding = struct('relative_permeability', 1.0,'relative_permittivity', epsilon.embedding);
-matname = setdiff(fieldnames(epsilon),'embedding');
-particle = struct('relative_permeability', 1.0,'relative_permittivity', epsilon.(matname{1}));
-materials = struct('embedding', embedding, matname{1}, particle);
+particle = struct('relative_permeability', 1.0,'relative_permittivity', epsilon.particle);
+
+scatterer = struct('material', particle, ...
+                  'geometry', geometry);
 
 
+method_parameters = struct('Lmax', int64(computation.Lmax), ...
+                            'Ntheta', int64(computation.Ntheta));
 s = struct('tmatrix', tmatrix, ...
     'vacuum_wavelength', wavelength, ...
     'embedding', embedding,...
-    'materials', materials, ...
-    'geometry', geometry, ...
+    'scatterer', scatterer, ...
     'modes', modes, ...
-    'computation', computation, ...
-    'uuid', uuid);
+    'computation', struct('method_parameters', method_parameters));
 
 saveh5(s, f, 'ComplexFormat', {'r','i'}, 'rootname', '', 'Compression', 'deflate'); 
 
-% deal with polarization manually
+
+% deal with string objects manually
+script = convertCharsToStrings(fileread(comments.script));
+h5create(f,'/computation/files/script', size(script), 'Datatype', 'string')
+h5write(f,'/computation/files/script', script)
+
 h5create(f,'/modes/polarization', size(polarization), 'Datatype', 'string')
 h5write(f,'/modes/polarization', polarization)
 
-% attributes
+% root attributes
 h5writeatt(f, '/', 'name', comments.name);
-h5writeatt(f, '/', 'created_with', 'Matlab easyh5');
-[major,minor,rel] = H5.get_libversion();
-h5writeatt(f, '/', 'storage_format_version', sprintf('%d.%d.%d',major,minor,rel));
+h5writeatt(f, '/', 'storage_format_version', 'v0.01'); 
 h5writeatt(f, '/','description', comments.description);
 h5writeatt(f, '/','keywords', comments.keywords);
+
+% object and group attributes
 h5writeatt(f, '/vacuum_wavelength', 'unit', 'nm');
-h5writeatt(f, '/uuid', 'version', '4');
-h5writeatt(f, '/geometry', 'name', geo_description);
+
+h5writeatt(f, '/embedding', 'name', epsilon.embedding_name);
+h5writeatt(f, '/embedding', 'reference', epsilon.embedding_reference);
+h5writeatt(f, '/embedding', 'keywords', epsilon.embedding_keywords);
+
+h5writeatt(f, '/scatterer/material', 'name', epsilon.material_name);
+h5writeatt(f, '/scatterer/material', 'reference', epsilon.material_reference);
+h5writeatt(f, '/scatterer/material', 'keywords', epsilon.material_keywords);
+
+h5writeatt(f, '/scatterer/geometry', 'name', 'homogeneous spheroid with symmetry axis z');
+h5writeatt(f, '/scatterer/geometry', 'unit', 'nm');
+h5writeatt(f, '/scatterer/geometry', 'shape', 'spheroid')
+
+[h5major,h5minor,h5rel] = H5.get_libversion(); % HDF5 version
+matlabv = version ; % Matlab version
+software = sprintf('SMARTIES=1.1, matlab=%s, HDF5=%d.%d.%d',matlabv,h5major,h5minor,h5rel);
+
+h5writeatt(f, '/computation', 'description', computation.description);
+h5writeatt(f, '/computation', 'accuracy', computation.accuracy);
+h5writeatt(f, '/computation', 'name', 'SMARTIES');
+h5writeatt(f, '/computation', 'method', 'EBCM, Extended Boundary Condition Method');
+h5writeatt(f, '/computation', 'software', software);
+
+ 
+% uuid = char(matlab.lang.internal.uuid());
+% h5writeatt(f, '/uuid', 'version', '4'); % not needed
+
 
 end

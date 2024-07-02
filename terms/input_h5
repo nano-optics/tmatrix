@@ -1,0 +1,13 @@
+ModeAndScheme 2 3 
+MultipoleCutoff 3 3 -4
+Wavelength 450 740 29
+Medium 1.7689 
+
+TmatrixFiles 1
+"spheroid_nm.h5" 
+
+OutputFormat HDF5 cross_sections
+
+# dimer, dihedral pi/4
+Scatterers 1
+TF1 0 0 0.0 40 0.0 0.0 0.0  2.0

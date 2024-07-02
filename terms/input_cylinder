@@ -1,0 +1,12 @@
+ModeAndScheme 2 3 
+MultipoleCutoff 4 4 
+Wavelength f wavelength_tio2  
+Medium 1
+
+TmatrixFiles 1
+"cylinder_nm.h5" 
+
+OutputFormat HDF5 cross_sections_tio2
+
+Scatterers 1
+TF1 0 0.0 0.0 350.0 0.0 0.0 0.0 1

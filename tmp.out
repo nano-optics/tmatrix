@@ -1,0 +1,48 @@
+<list>
+├─data: <list>
+│ ├─computation: <list>
+│ │ ├─files: <list>
+│ │ │ └─export_python.py: "import numpy as np↵import os, sy..."
+│ │ └─method_parameters: <list>
+│ │   ├─Lmax: 3
+│ │   └─Ntheta: 100
+│ ├─embedding: <list>
+│ │ ├─relative_permeability: 1
+│ │ └─relative_permittivity: 1.7689
+│ ├─modes: <list>
+│ │ ├─l<dbl [30]>: 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, ...
+│ │ ├─m<dbl [30]>: -1, -1, 0, 0, 1, 1, -2, -2, -1, -1, ...
+│ │ └─polarization<chr [30]>: "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", "electric", "magnetic", ...
+│ ├─scatterer: <list>
+│ │ ├─geometry: <list>
+│ │ │ ├─radiusxy: 20
+│ │ │ └─radiusz: 40
+│ │ └─material: <list>
+│ │   ├─relative_permeability: 1
+│ │   └─relative_permittivity<cpl [9]>: -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i, -11.4+1.181i
+│ ├─tmatrix<cpl [8,100]>: 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 1+1i, 31+31i, ...
+│ └─vacuum_wavelength<int [9]>: 400, 450, 500, 550, 600, 650, 700, 750, 800
+└─attributes: <list>
+  ├─root: <list>
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─keywords: "gold, spheroid, ebcm, passive, r..."
+  │ ├─name: "Au prolate spheroid in water"
+  │ └─storage_format_version: "v0.01"
+  ├─vacuum_wavelength: <list>
+  │ └─unit: "nm"
+  ├─computation: <list>
+  │ ├─description: "Computation using SMARTIES, a nu..."
+  │ ├─method: "EBCM, Extended Boundary Conditio..."
+  │ ├─name: "SMARTIES"
+  │ └─software: "SMARTIES=1.1, python=3.11.7, h5p..."
+  ├─embedding: <list>
+  │ ├─keywords: "non-dispersive"
+  │ └─name: "H2O, Water"
+  ├─material: <list>
+  │ ├─keywords: "dispersive, plasmonic"
+  │ ├─name: "Au, Gold"
+  │ └─reference: "Au from Raschke et al 10.1103/Ph..."
+  └─geometry: <list>
+    ├─name: "homogeneous spheroid with symmet..."
+    ├─shape: "spheroid"
+    └─unit: "nm"

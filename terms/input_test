@@ -1,0 +1,12 @@
+ModeAndScheme 2 3 
+MultipoleCutoff 6 6 
+Wavelength 300 700 200
+Medium 1.0 
+
+TmatrixFiles 1
+"tetrahedron.h5" 
+
+OutputFormat HDF5 cross_sections
+
+Scatterers 1
+TF1 0 0.0 0.0 270.0 0 0.0 0 1

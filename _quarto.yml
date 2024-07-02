@@ -14,9 +14,10 @@ website:
     left:
       - text: "Exporting to HDF5"
         menu:
-        - R_export.qmd
-        - matlab_export.qmd 
-        - julia_export.qmd 
+        - export_julia.qmd 
+        - export_matlab.qmd 
+        - export_python.qmd 
+        - export_R.qmd
       - text: "Conversion long/wide"
         file: conversion.qmd
       - text: "Indexing reference"

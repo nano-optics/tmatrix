@@ -1,5 +1,5 @@
 ---
-title: "Conversion long/wide"
+title: "Conversion long/wide format"
 format: html
 author: "baptiste"
 date: today
@@ -28,7 +28,8 @@ names(d) <- c('s','sp','l','lp','m','mp','Tr','Ti')
 head(d)
 ```
 
-Note that one advantage of this format is that only non-zero entries need to be provided, similar to a sparse matrix definition.
+Note that one advantage of this format is that only non-zero entries need to be provided, similar to a sparse matrix definition. This is useful for EBCM-like analytical methods where particle symmetries dictate that some T-matrix elements be identically zero (plane of symmetry, axis of symmetry, etc.).
+
 With such data, it can be useful to add combined indices $p$ (blocks) and $q$ (full matrix), as illustrated below:
 
 ```{r}

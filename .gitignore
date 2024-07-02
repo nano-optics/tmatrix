@@ -51,3 +51,5 @@ rsconnect/
 /.quarto/
 _site/
 export/
+_experiments/
+fem/
