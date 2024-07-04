@@ -92,36 +92,65 @@ tmatrix_breaks <- function(lmax){
 }
 
 ## ---- read_treams
-read_treams <- function(f){
-  tmat <- rhdf5::h5read(f, 'tmatrix', compoundAsDataFrame = FALSE)
-  modes <- rhdf5::h5read(f, 'modes', compoundAsDataFrame = FALSE)
-  params <- rhdf5::h5read(f, 'computation')$method_parameters
+
+read_tmat <- function(f){
+  h5closeAll()
   
-  nonzero <- is.finite(log10(Mod(tmat)))
-  ind <- which(nonzero, arr.ind = TRUE)
+  tmatrix <- rhdf5::h5read(f, 'tmatrix', compoundAsDataFrame = FALSE, native = TRUE)
+  modes <- rhdf5::h5read(f, 'modes', compoundAsDataFrame = FALSE, native = TRUE)
+  wavelengths <- rhdf5::h5read(f, 'vacuum_wavelength', compoundAsDataFrame = FALSE, native = TRUE)
+  # ind633 <- which(abs(wavelengths - 6.3e-7 ) < 0.01e-9)
+  tmat_dims <- dim(tmatrix)
+  message("tmatrix dimensions: ",paste(tmat_dims, collapse="x"))
+  # tmatrixcan be either a matrix (single wavelength), or an array with 1 dimension wavelengths
+  # so we need to handle both cases separately (it's awkward to slice by first index)
+  if(length(tmat_dims) == 2){
+    n <- tmat_dims[1]
+    
+  } else if(length(tmat_dims) == 3){
+    stopifnot(tmat_dims[1] == length(wavelengths))
+    n <- tmat_dims[2] # size of matrix
+    
+  } else {
+    error("dimensions of t-matrix should be 2 or 3")
+  }
   
-  n <- nrow(tmat)
-  modes$s <- ifelse(modes$polarization == 'electric', 1, 2)
+  modes$s <- ifelse(modes$polarization == 'magnetic', 1, 2)
   l <- matrix(modes$l, nrow=n, ncol=n, byrow=FALSE); lp=t(l)
   m <- matrix(modes$m, nrow=n, ncol=n, byrow=FALSE); mp=t(m)
   s <- matrix(modes$s, nrow=n, ncol=n, byrow=FALSE); sp=t(s)
   
-  treams <- data.frame(s = s[ind], sp = sp[ind], 
-                       l = l[ind], lp = lp[ind],  
-                       m = m[ind], mp = mp[ind], 
-                       Tr = Re(tmat[ind]), Ti = Im(tmat[ind])) |> 
-    arrange(s,sp,l,lp,m,mp)
+  # process a single wavelength
+  single_wavelength <- function(tmat){
+    
+    nonzero <- is.finite(log10(Mod(tmat)))
+    ind <- which(nonzero, arr.ind = TRUE)
+    
+    long_tmat<- data.frame(s = s[ind], sp = sp[ind], 
+                              l = l[ind], lp = lp[ind],  
+                              m = m[ind], mp = mp[ind], 
+                              value = tmat[ind], 
+                              Tr = Re(tmat[ind]), Ti = Im(tmat[ind])) |> 
+      arrange(s,sp,l,lp,m,mp)
+    
+    long_tmat$mod <- Mod(long_tmat$Tr + 1i*long_tmat$Ti)
+    
+    long_tmat$p <- p_index(long_tmat$l, long_tmat$m)
+    long_tmat$pp <- p_index(long_tmat$lp, long_tmat$mp)
+    long_tmat$q <- q_index(long_tmat$p, long_tmat$s, max(long_tmat$p))
+    long_tmat$qp <- q_index(long_tmat$pp, long_tmat$sp, max(long_tmat$pp))
+    
+    return(long_tmat)
+  }
   
-  treams$mod <- Mod(treams$Tr + 1i*treams$Ti)
-  
-  treams$p <- p_index(treams$l, treams$m)
-  treams$pp <- p_index(treams$lp, treams$mp)
-  treams$q <- q_index(treams$p, treams$s, max(treams$p))
-  treams$qp <- q_index(treams$pp, treams$sp, max(treams$pp))
-  
-  return(cbind(treams, params))
+  if(length(tmat_dims) == 2){
+    result <- single_wavelength(tmatrix)
+  } else {
+    # this will slice by first index, and return a list with Nl entries
+    result <- apply(tmatrix, 1, single_wavelength, simplify = FALSE)
+  } 
+  return(result)
 }
-
 
 
 ## ---- tmatrix_wide
