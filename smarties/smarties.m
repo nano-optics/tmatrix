@@ -10,7 +10,8 @@ accuracy = 1e-10;
 
 % prolate Au spheroid in water
 % semi-axes a=b=20nm, c=40nm
-wavelength = 600:50:800; wavelength = wavelength(:);
+% wavelength = 600:50:800; wavelength = wavelength(:);
+wavelength = 633:50:800; wavelength = wavelength(:);
 Nl = length(wavelength);
 epsilon=epsAu(wavelength);
 medium=1.33;
@@ -61,7 +62,7 @@ for i=1:Nl
 end
 
 %% now redo calculations for all wavelengths with these fixed params
-
+globalN = 3;
 % allocate 3D array for all results
 qmax = 2*(globalN*(globalN + 1) + globalN );
 tmatrix = zeros(Nl, qmax, qmax);

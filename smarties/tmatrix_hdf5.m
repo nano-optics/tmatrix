@@ -32,7 +32,7 @@ for l=1:Lmax
         end
     end
 end
-polars = ["electric","magnetic"];
+polars = ["magnetic","electric"];
 polarization = polars(modes.s);
 modes = rmfield(modes,'s');
 

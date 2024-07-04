@@ -20,7 +20,7 @@ s = np.array([b'xxxxxxic']*len(l))
 i=0
 for li in range(1,lmax+1):
     for mi in range(-li, li+1):
-        for si in [b'electric', b'magnetic']:
+        for si in [b'magnetic', b'electric']:
             l[i] = li
             m[i] = mi
             s[i] = si
